@@ -7,17 +7,18 @@ import by.epam.zhalabkevich.my_telecom.bean.User;
 import java.util.List;
 
 public interface UserDAO {
-    //число пользователей может быть надо
+    //TODO число пользователей может быть надо
 
-    boolean addUser(User user) throws DAOException;
+    User addUser(User user) throws DAOException;
 
     Long addAuthInfo(AuthorizationInfo info) throws DAOException;
 
     User findUserById(long id) throws DAOException; //нужна ли
 
     User findUserByLogin(String login) throws DAOException;
+    AuthorizationInfo findUserAuthInfoByLogin(String login) throws DAOException;
 
-    User findUserByLoginAndPassword(String login, String password) throws DAOException;
+    User findUserByLoginAndPassword(AuthorizationInfo info) throws DAOException;
 
     List<User> getUsersRange(int page, int limit) throws DAOException;
 
@@ -30,12 +31,12 @@ public interface UserDAO {
 //    List<User> findUsersByPhone(String phone) throws DAOException;
 
     //изменить имя на unique
-    boolean isLoginExist(String login) throws DAOException; // аналогично findBy Login
+    int isLoginExist(String login) throws DAOException; // аналогично findBy Login
 
     //  String getPasswordByLogin(String login) throws DAOException; //надо другой метод по логину и паролю
 
 
-    boolean updateUserInfo(User user) throws DAOException;
+    User updateUserInfo(User user) throws DAOException;
 
     boolean updatePassword(String newPassword, User user) throws DAOException;
 

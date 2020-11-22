@@ -106,7 +106,7 @@ public class SQLUserDAO implements UserDAO {
 
     //нужна ли транзакция на уровне серисов для создания нового юзера пароль + данные
     @Override
-    public boolean addUser(User user) throws DAOException {
+    public User addUser(User user) throws DAOException {
 
         try {
             PreparedStatement statement = preparedStatementMap.get(ADD_USER);
@@ -116,7 +116,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getAddress());
             statement.setLong(6, user.getId());
-            return statement.executeUpdate() == 1;
+            return statement.executeUpdate() == 1 ? user : new User();
 
         } catch (SQLException e) {
             logger.error(e);
@@ -157,7 +157,7 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    @Override //статус и роль отдать юзеру, чтобы было удобно с ним дальше работать
+    @Override
     public User findUserByLogin(String login) throws DAOException {
         //"SELECT auth_info_id, name, surname, address, phone, email, role, status FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?";
         try {
@@ -170,14 +170,19 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
+//TODO
+    @Override
+    public AuthorizationInfo findUserAuthInfoByLogin(String login) throws DAOException {
+        return null;
+    }
 
     @Override
-    public User findUserByLoginAndPassword(String login, String password) throws DAOException {
+    public User findUserByLoginAndPassword(AuthorizationInfo info) throws DAOException {
         //"SELECT auth_info_id, name, surname, address, phone, email, role, status FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
         PreparedStatement statement = preparedStatementMap.get(FIND_USER_BY_LOGIN_AND_PASSWORD);
         try {
-            statement.setString(1, login);
-            statement.setString(2, password);
+            statement.setString(1, info.getLogin());
+            statement.setString(2, info.getPassword());
             ResultSet resultSet = statement.executeQuery();
             return resultSet.next() ? convertResultSet(resultSet) : new User();
         } catch (SQLException e) {
@@ -225,13 +230,13 @@ public class SQLUserDAO implements UserDAO {
 //    }
 
     @Override //возвращает количество таких логинов
-    public boolean isLoginExist(String login) throws DAOException {
+    public int isLoginExist(String login) throws DAOException {
         PreparedStatement statement = preparedStatementMap.get(IS_LOGIN_EXIST);
         ResultSet resultSet = null;
         try {
             resultSet = statement.executeQuery();
             resultSet.next();
-            return resultSet.getInt(1) == 0;
+            return resultSet.getInt(1);
         } catch (SQLException e) {
             throw new DAOException(e);
         }
@@ -239,7 +244,7 @@ public class SQLUserDAO implements UserDAO {
 
 
     @Override
-    public boolean updateUserInfo(User user) throws DAOException {
+    public User updateUserInfo(User user) throws DAOException {
         //"UPDATE user SET name=?, surname=?, phone=?, email=?, address=?, status = ?, role = ?   WHERE id = ?;";
         try {
             PreparedStatement statement = preparedStatementMap.get(UPD_USER_INFO);
@@ -251,7 +256,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(6, String.valueOf(user.getStatus()));
             statement.setString(7, String.valueOf(user.getRole()));
             statement.setLong(8, user.getId());
-            return statement.executeUpdate() == 1;
+            return statement.executeUpdate() == 1 ? user : new User();
         } catch (SQLException e) {
             logger.error("sql cant upd info");
             logger.error(e);
@@ -261,7 +266,7 @@ public class SQLUserDAO implements UserDAO {
 
     @Override //передавать всего юзера или id
     public boolean updatePassword(String newPassword, User user) throws DAOException {
-      //  UPDATE auth_info SET password=? WHERE id=?;
+        //  UPDATE auth_info SET password=? WHERE id=?;
         try { //password уже зашифрован
             PreparedStatement statement = preparedStatementMap.get(UPD_PASS_BY_ID);
             statement.setString(1, newPassword);
