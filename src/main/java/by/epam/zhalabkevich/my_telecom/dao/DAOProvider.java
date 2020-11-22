@@ -1,6 +1,5 @@
 package by.epam.zhalabkevich.my_telecom.dao;
 
-import by.epam.zhalabkevich.my_telecom.bean.Account;
 import by.epam.zhalabkevich.my_telecom.dao.impl.SQLAccountDAO;
 import by.epam.zhalabkevich.my_telecom.dao.impl.SQLPromotionDAO;
 import by.epam.zhalabkevich.my_telecom.dao.impl.SQLTariffDAO;

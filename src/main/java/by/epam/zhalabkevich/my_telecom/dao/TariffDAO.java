@@ -1,7 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.dao;
 
 import by.epam.zhalabkevich.my_telecom.bean.Tariff;
-import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 
 import java.util.List;
 
