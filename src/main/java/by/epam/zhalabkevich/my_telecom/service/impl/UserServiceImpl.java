@@ -2,6 +2,7 @@ package by.epam.zhalabkevich.my_telecom.service.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
 import by.epam.zhalabkevich.my_telecom.bean.User;
+import by.epam.zhalabkevich.my_telecom.dao.AccountDAO;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.DAOProvider;
 import by.epam.zhalabkevich.my_telecom.dao.UserDAO;
@@ -19,15 +20,16 @@ import java.util.List;
  * 1. is login uniq
  * 2. save auth info
  * 3. save User
+ * 4. create account
  *
  * */
 public class UserServiceImpl implements UserService {
     private final static Logger logger = LogManager.getLogger();
     private final DAOProvider provider = DAOProvider.getInstance();
     private final UserDAO userDAO = provider.getUserDao();
+    private final AccountDAO accountDAO = provider.getAccountDAO();
     private final UserDataValidator validator = UserDataValidator.getInstance();
 
-    private static final int LIMIT = 5;
 //TODO выбрасывать исключение с описанием ошибки или возвращать пустого пользователя?
     public User register(AuthorizationInfo info, User user) throws ServiceException {
         if (isLoginUniq(info.getLogin()) == 0) {
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService {
                 if (validator.userValidate(user)) {
                     try {
                         user.setId(userDAO.addAuthInfo(info));
+                        accountDAO.addAccount(user.getId());
                        return userDAO.addUser(user);
                     } catch (DAOException e) {
                         logger.error(e);
@@ -104,9 +107,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersRange(int page) throws ServiceException {
+    public List<User> getUsersRange(int page, int limit) throws ServiceException {
         try {
-            return userDAO.getUsersRange(page, LIMIT);
+            return userDAO.getUsersRange(page, limit);
         } catch (DAOException e) {
             logger.error(e);
             throw new ServiceException("Impossible to show users");

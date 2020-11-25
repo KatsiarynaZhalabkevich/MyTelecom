@@ -1,8 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.dao.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
-import by.epam.zhalabkevich.my_telecom.bean.Role;
-import by.epam.zhalabkevich.my_telecom.bean.Status;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.UserDAO;
@@ -33,7 +31,7 @@ public class SQLUserDAO implements UserDAO {
     //+
     private final static String ADD_USER = "INSERT INTO users (name, surname, phone, email, address, id) value (?,?,?,?,?,?);";
     private final static String FIND_AUTH_INFO_BY_LOGIN = "SELECT login, password FROM auth_info WHERE login = ?";
-    private final static String FIND_USER_BY_ID = "SELECT * FROM  users WHERE user.id=?;";
+    private final static String FIND_USER_BY_ID = "SELECT id, name, surname, address, phone, email FROM  users WHERE user.id=?;";
     private final static String IS_LOGIN_EXIST = "SELECT COUNT(login) FROM auth_info WHERE login=?;";
     private final static String UPD_USER_INFO = "UPDATE users SET name=?, surname=?, phone=?, email=?, address=? WHERE id = ?;";
     private final static String UPD_PASS_BY_ID = "UPDATE auth_info SET password=? WHERE id=?;"; //+
@@ -42,13 +40,13 @@ public class SQLUserDAO implements UserDAO {
 
     private final static String UPD_USER_BALANCE_BY_ID = "UPDATE accounts SET balance=? WHERE id=?";
 
-    private static final String GET_USERS_FROM_TO = "SELECT * FROM users LIMIT ? OFFSET ?;";
+    private static final String GET_USERS_FROM_TO = "SELECT id, name, surname, address, phone, email FROM users LIMIT ? OFFSET ?;";
     private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = "SELECT auth_info_id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
     public SQLUserDAO() {
-        Connection connection = null;
+        Connection connection;
         try {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, FIND_USER_BY_LOGIN);
@@ -227,31 +225,11 @@ public class SQLUserDAO implements UserDAO {
         }
         return users;
     }
-//пока не будем реализовывать
-//    @Override
-//    public List<User> findUsersByName(String name) throws DAOException {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<User> findUsersBySurname(String surname) throws DAOException {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<User> findUsersByEmail(String email) throws DAOException {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<User> findUsersByPhone(String phone) throws DAOException {
-//        return null;
-//    }
 
     @Override //возвращает количество таких логинов
     public int isLoginUnique(String login) throws DAOException {
         PreparedStatement statement = preparedStatementMap.get(IS_LOGIN_EXIST);
-        ResultSet resultSet = null;
+        ResultSet resultSet;
         try {
             resultSet = statement.executeQuery();
             resultSet.next();
@@ -260,7 +238,6 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
-
 
     @Override
     public User updateUserInfo(User user) throws DAOException {
@@ -295,8 +272,6 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
-
-
 
     @Override
     public boolean deleteUser(long id) throws DAOException {

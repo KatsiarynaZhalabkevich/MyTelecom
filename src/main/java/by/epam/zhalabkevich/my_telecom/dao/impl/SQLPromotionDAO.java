@@ -5,11 +5,15 @@ import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.PromotionDAO;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPoolException;
+import by.epam.zhalabkevich.my_telecom.dao.util.QueryParameter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SQLPromotionDAO implements PromotionDAO {
@@ -17,24 +21,23 @@ public class SQLPromotionDAO implements PromotionDAO {
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     private static final String ADD_PROMO = "INSERT INTO promotions (description, date_start, date_end, discount) VALUE (?, ?, ?, ?);";
-    private static final String UPDATE_PROMO = "UPDATE promotions SET description = ?, date_start = ?, date_end = ?, discount = ? WHERE = ?;";
+    private static final String UPDATE_PROMO = "UPDATE promotions SET description = ?, date_start = ?, date_end = ?, discount = ? WHERE id = ?;";
     private static final String DEL_PROMO_BY_ID = "DELETE FROM promotions WHERE id = ?;";
+    private static final String ADD_PROMO_TO_TARIFF ="UPDATE tariffs SET promotion_id = ? WHERE id = ?;" ;
+    private static final String GET_PROMOTIONS_FROM_TO = "SELECT id, description, date_start, date_end, discount  FROM promotions LIMIT ? OFFSET ?;";
 
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
     public SQLPromotionDAO() {
-        Connection connection = null;
+        Connection connection;
         try {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, ADD_PROMO);
             setPreparedStatement(connection, UPDATE_PROMO);
             setPreparedStatement(connection, DEL_PROMO_BY_ID);
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
+            setPreparedStatement(connection, ADD_PROMO_TO_TARIFF);
+            setPreparedStatement(connection, GET_PROMOTIONS_FROM_TO);
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
@@ -70,7 +73,7 @@ public class SQLPromotionDAO implements PromotionDAO {
             }
             return promotion;
         } catch (SQLException e) {
-            logger.error("Can't add promotion");
+            logger.error("Impossible add promotion");
             throw new DAOException(e);
         }
     }
@@ -88,7 +91,7 @@ public class SQLPromotionDAO implements PromotionDAO {
 
             return statement.executeUpdate();
         } catch (SQLException e) {
-            logger.error("Can't add promotion");
+            logger.error("Impossible update promotion");
             throw new DAOException(e);
         }
     }
@@ -101,8 +104,47 @@ public class SQLPromotionDAO implements PromotionDAO {
             statement.setLong(1, id);
             return statement.executeUpdate();
         } catch (SQLException e) {
-            logger.error("can't delete tariff");
+            logger.error("Impossible delete promotion");
             throw new DAOException(e);
         }
+    }
+
+    @Override
+    public int addPromotionToTariffById(long tariffId, long promotionId) throws DAOException {
+        //UPDATE tariffs SET promotion_id = ? WHERE id = ?;
+        try {
+            PreparedStatement statement = preparedStatementMap.get(ADD_PROMO_TO_TARIFF);
+            statement.setLong(1, promotionId);
+            statement.setLong(2, tariffId);
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Impossible set promotion to tariff");
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public List<Promotion> getPromotions(int offset, int limit) throws DAOException {
+        //SELECT id, description, date_start, date_end, discount  FROM promotions LIMIT ? OFFSET ?;
+        List<Promotion> promotions = new ArrayList<>();
+        PreparedStatement statement = preparedStatementMap.get(GET_PROMOTIONS_FROM_TO);
+        try {
+            statement.setInt(1, limit);
+            statement.setInt(2, offset);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                long id = resultSet.getLong(QueryParameter.ID);
+                String description = resultSet.getString(QueryParameter.DESCRIPTION);
+                LocalDateTime dateStart = LocalDateTime.parse(resultSet.getString(QueryParameter.DATE_START));
+                LocalDateTime dateEnd = LocalDateTime.parse(resultSet.getString(QueryParameter.DATE_END));
+                double discount = resultSet.getDouble(QueryParameter.DISCOUNT);
+
+                promotions.add(new Promotion(id, description, dateStart, dateEnd, discount));
+            }
+        } catch (SQLException e) {
+            logger.error("Impossible get promotions list");
+            throw new DAOException(e);
+        }
+        return promotions;
     }
 }

@@ -21,11 +21,12 @@ public class SQLAccountDAO implements AccountDAO {
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
 
 
-    private static final String ADD_ACCOUNT = "INSERT INTO accounts (balance, registration_date, id) VALUE (?, ?, ?);";
+    private static final String ADD_ACCOUNT = "INSERT INTO accounts SET user_id = ?;";
     private static final String UPD_ACCOUNT = "UPDATE accounts SET balance = ?, registration_date = ? WHERE id = ?;";
     private static final String DEL_ACCOUNT = "DELETE FROM accounts WHERE id = ?;";
     private static final String GET_ACCOUNT_BY_ID = "SELECT balance, registration_date FROM accounts WHERE id = ?;";
-    private final static String UPD_USER_STATUS_BY_ID = "UPDATE accounts SET status=? WHERE id=?";
+    private final static String UPD_USER_STATUS_BY_ID = "UPDATE accounts SET status=? WHERE user_id=?";
+    private static final String UPD_BALANCE_BY_USER_ID = "UPDATE accounts SET balance = ? WHERE user_id = ?;" ;
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
@@ -35,8 +36,8 @@ public class SQLAccountDAO implements AccountDAO {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, ADD_ACCOUNT);
             setPreparedStatement(connection, UPD_ACCOUNT);
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
+            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
+            setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
 //            setPreparedStatement(connection, "");
 //            setPreparedStatement(connection, "");
 
@@ -60,14 +61,12 @@ public class SQLAccountDAO implements AccountDAO {
     //объединить в один метод??? add&update
 
     @Override //id уже есть из user
-    public int addAccount(Account account) throws DAOException {
-        //INSERT INTO accounts (balance, registration_date, id) VALUE (?, ?, ?);
+    public boolean addAccount(long id) throws DAOException {
+        //INSERT INTO accounts SET user_id = ?;
         try {
             PreparedStatement statement = preparedStatementMap.get(ADD_ACCOUNT);
-            statement.setBigDecimal(1, account.getBalance());
-            statement.setDate(2, Date.valueOf(String.valueOf(account.getRegistrationDate())));
-            statement.setLong(3, account.getId());
-            return statement.executeUpdate();
+            statement.setLong(1,id);
+            return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             logger.error(e);
             logger.error("SQL problem with account");
@@ -75,7 +74,7 @@ public class SQLAccountDAO implements AccountDAO {
         }
     }
 
-    @Override
+    @Override //user_id может не совпадать, хотя хотелось бы. Подстроить id или убрать авто генерацию
     public int updateAccount(Account account) throws DAOException {
         //UPDATE accounts SET balance = ?, registration_date = ? WHERE id = ?;
         try {
@@ -106,8 +105,8 @@ public class SQLAccountDAO implements AccountDAO {
     }
 
     @Override
-    public Account getAccountById(long id) throws DAOException {
-        //SELECT balance, registration_date FROM accounts WHERE id = ?;
+    public Account getAccountByUserId(long id) throws DAOException {
+        //SELECT balance, status, registration_date FROM accounts WHERE id = ?;
         Account account = new Account();
         try {
             PreparedStatement statement = preparedStatementMap.get(GET_ACCOUNT_BY_ID);
@@ -116,7 +115,10 @@ public class SQLAccountDAO implements AccountDAO {
             if(resultSet.next()){
                 account.setId(id);
                 account.setBalance(resultSet.getBigDecimal(QueryParameter.BALANCE));
-                account.setRegistrationDate(LocalDateTime.parse(String.valueOf(resultSet.getDate(QueryParameter.REGISTRATION_DATE))));
+                account.setStatus(Status.valueOf(resultSet.getString(QueryParameter.STATUS)));
+                account.setRegistrationDate(LocalDateTime.parse(
+                        String.valueOf(resultSet.getDate(QueryParameter.REGISTRATION_DATE))
+                ));
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -126,22 +128,32 @@ public class SQLAccountDAO implements AccountDAO {
         return account;
     }
 
-    @Override
-    public void updateUserBalanceById(int id, double balance) throws DAOException {
-
-    }
-
-    //статус в аккаунте
-    @Override //передавать id или всего юзера
-    public boolean updateStatus(Status status, User user) throws DAOException {
+    @Override //баланс сразу исходная сумма
+    public boolean updateBalanceByUserId(long id, double balance) throws DAOException {
+        //UPDATE accounts SET balance = ? WHERE user_id = ?;
         try {
-            PreparedStatement statement = preparedStatementMap.get(UPD_USER_STATUS_BY_ID);
-            statement.setString(1, String.valueOf(status));
-            statement.setLong(2, user.getId());
+            PreparedStatement statement = preparedStatementMap.get(UPD_BALANCE_BY_USER_ID);
+            statement.setString(1, String.valueOf(balance));
+            statement.setLong(2, id);
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             logger.error(e);
-            throw new DAOException("can't upd active field");
+            throw new DAOException("Impossible to update user balance");
+        }
+
+    }
+
+
+    @Override
+    public boolean updateStatus(Status status, long id) throws DAOException {
+        try {
+            PreparedStatement statement = preparedStatementMap.get(UPD_USER_STATUS_BY_ID);
+            statement.setString(1, String.valueOf(status));
+            statement.setLong(2, id);
+            return statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException("Impossible to update user's status");
         }
     }
 }

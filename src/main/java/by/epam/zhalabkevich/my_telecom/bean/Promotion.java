@@ -16,7 +16,8 @@ public class Promotion implements Serializable {
     public Promotion() {
     }
 
-    public Promotion(String description, LocalDateTime dateStart, LocalDateTime dateEnd, double discount) {
+    public Promotion(long id, String description, LocalDateTime dateStart, LocalDateTime dateEnd, double discount) {
+        this.id = id;
         this.description = description;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
