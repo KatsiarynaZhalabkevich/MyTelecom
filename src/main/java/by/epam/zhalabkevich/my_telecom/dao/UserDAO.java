@@ -1,7 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.dao;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
-import by.epam.zhalabkevich.my_telecom.bean.Status;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 
 import java.util.List;
@@ -16,6 +15,7 @@ public interface UserDAO {
     User findUserById(long id) throws DAOException; //нужна ли
 
     User findUserByLogin(String login) throws DAOException;
+
     AuthorizationInfo findUserAuthInfoByLogin(String login) throws DAOException;
 
     User findUserByLoginAndPassword(AuthorizationInfo info) throws DAOException;
@@ -30,19 +30,11 @@ public interface UserDAO {
 //
 //    List<User> findUsersByPhone(String phone) throws DAOException;
 
-    //изменить имя на unique
-    int isLoginExist(String login) throws DAOException; // аналогично findBy Login
-
-    //  String getPasswordByLogin(String login) throws DAOException; //надо другой метод по логину и паролю
-
+    int isLoginUnique(String login) throws DAOException; // аналогично findBy Login
 
     User updateUserInfo(User user) throws DAOException;
 
     boolean updatePassword(String newPassword, User user) throws DAOException;
-
-    boolean updateStatus(Status status, User user) throws DAOException;
-
- //   void updateUserBalanceById(int id, double balance) throws DAOException; //переннести в аккаунт
 
     boolean deleteUser(long id) throws DAOException;
 

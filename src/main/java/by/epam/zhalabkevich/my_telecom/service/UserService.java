@@ -17,10 +17,10 @@ public interface UserService {
     List<User> getUsersRange(int page) throws ServiceException;
 
     boolean deleteUser(long id) throws ServiceException;
-
     // перенести в аккаунт
 //    boolean changeBalanceById(int id, double balance) throws ServiceException;
 //    boolean changeStatusById(int id, boolean active) throws ServiceException;
     User getUserById(long id) throws ServiceException;
+    boolean updatePassword (String newPassword, User user) throws ServiceException;
 
 }

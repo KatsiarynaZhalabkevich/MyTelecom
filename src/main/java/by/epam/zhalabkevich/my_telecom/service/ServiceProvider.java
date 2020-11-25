@@ -1,5 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.service;
 
+import by.epam.zhalabkevich.my_telecom.service.impl.TariffServiceImpl;
 import by.epam.zhalabkevich.my_telecom.service.impl.UserServiceImpl;
 
 public class ServiceProvider {
@@ -8,8 +9,8 @@ public class ServiceProvider {
     private ServiceProvider() {
     }
 
-    private UserService userService = new UserServiceImpl();
-//    private TarifService tarifService = new TarifServiceImpl();
+    private final UserService userService = new UserServiceImpl();
+    private final TariffService tariffService = new TariffServiceImpl();
 //    private NoteService noteService = new NoteServiceImpl();
 
 
@@ -20,7 +21,10 @@ public class ServiceProvider {
     public UserService getUserService() {
         return userService;
     }
-//    public TarifService getTarifService(){return tarifService;}
+
+    public TariffService getTariffService() {
+        return tariffService;
+    }
 //    public NoteService getNoteService(){return noteService;}
 
 }

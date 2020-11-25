@@ -54,10 +54,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
+    @Override //может быть возвращать аккаунт?
     public User authorize(AuthorizationInfo info) throws ServiceException {
         try {
             AuthorizationInfo infoFromDB = userDAO.findUserAuthInfoByLogin(info.getLogin());
+            System.out.println("user info"+info);
+            System.out.println("info from DB"+infoFromDB);
             return PasswordCreater.verifyPassword(info.getPassword(), infoFromDB.getPassword())?
                     userDAO.findUserByLogin(infoFromDB.getLogin()): new User();
         } catch (DAOException e) {
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
     public int isLoginUniq(String login) throws ServiceException {
         if (validator.checkLogin(login)) {
             try {
-                return userDAO.isLoginExist(login);
+                return userDAO.isLoginUnique(login);
             } catch (DAOException e) {
                 logger.error(e);
                 throw new ServiceException("Impossible to get data about login");
@@ -129,5 +131,20 @@ public class UserServiceImpl implements UserService {
             logger.error(e);
             throw new ServiceException("Impossible to get User");
         }
+    }
+
+    @Override
+    public boolean updatePassword(String newPassword, User user) throws ServiceException {
+        if(validator.checkPassword(newPassword)){
+            try {
+              return userDAO.updatePassword(newPassword, user);
+            } catch (DAOException e) {
+                logger.error(e);
+                throw  new ServiceException("Impossible to update password");
+            }
+        }else{
+            throw new ServiceException("New password is not valid");
+        }
+
     }
 }

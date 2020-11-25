@@ -27,22 +27,23 @@ public class SQLUserDAO implements UserDAO {
 
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
     //+
-    private final static String FIND_USER_BY_LOGIN = "SELECT auth_info_id, name, surname, address, phone, email, role, status FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?;";
+    private final static String FIND_USER_BY_LOGIN = "SELECT users.id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?;";
     //+
     private final static String ADD_USER_AUTH_INFO = "INSERT INTO auth_info (login, password) value (?, ?)";
     //+
     private final static String ADD_USER = "INSERT INTO users (name, surname, phone, email, address, id) value (?,?,?,?,?,?);";
+    private final static String FIND_AUTH_INFO_BY_LOGIN = "SELECT login, password FROM auth_info WHERE login = ?";
     private final static String FIND_USER_BY_ID = "SELECT * FROM  users WHERE user.id=?;";
     private final static String IS_LOGIN_EXIST = "SELECT COUNT(login) FROM auth_info WHERE login=?;";
-    private final static String UPD_USER_INFO = "UPDATE users SET name=?, surname=?, phone=?, email=?, address=?, status = ?, role = ? WHERE id = ?;";
+    private final static String UPD_USER_INFO = "UPDATE users SET name=?, surname=?, phone=?, email=?, address=? WHERE id = ?;";
     private final static String UPD_PASS_BY_ID = "UPDATE auth_info SET password=? WHERE id=?;"; //+
     private final static String GET_PASS_BY_ID = "SELECT password FROM auth_info WHERE id=?";
     private final static String DELETE_USER_BY_ID = "DELETE  FROM auth_info WHERE id=?;";
 
     private final static String UPD_USER_BALANCE_BY_ID = "UPDATE accounts SET balance=? WHERE id=?";
-    private final static String UPD_USER_STATUS_BY_ID = "UPDATE users SET status=? WHERE id=?";
+
     private static final String GET_USERS_FROM_TO = "SELECT * FROM users LIMIT ? OFFSET ?;";
-    private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = "SELECT auth_info_id, name, surname, address, phone, email, role, status FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
+    private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = "SELECT auth_info_id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
@@ -60,9 +61,9 @@ public class SQLUserDAO implements UserDAO {
             setPreparedStatement(connection, DELETE_USER_BY_ID);
             setPreparedStatement(connection, UPD_PASS_BY_ID);
             setPreparedStatement(connection, UPD_USER_BALANCE_BY_ID);
-            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
             setPreparedStatement(connection, GET_USERS_FROM_TO);
             setPreparedStatement(connection, FIND_USER_BY_LOGIN_AND_PASSWORD);
+            setPreparedStatement(connection, FIND_AUTH_INFO_BY_LOGIN);
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
         }
@@ -71,14 +72,14 @@ public class SQLUserDAO implements UserDAO {
     private User convertResultSet(ResultSet resultSet) throws DAOException {
         User user = new User();
         try {
-            user.setId(resultSet.getInt(QueryParameter.ID));
+            user.setId(resultSet.getLong(QueryParameter.ID));
             user.setName(resultSet.getString(QueryParameter.NAME));
             user.setSurname(resultSet.getString(QueryParameter.SURNAME));
             user.setPhone(resultSet.getString(QueryParameter.PHONE));
             user.setEmail(resultSet.getString(QueryParameter.EMAIL));
             user.setAddress(resultSet.getString(QueryParameter.ADDRESS));
-            user.setRole(Role.valueOf(resultSet.getString(QueryParameter.ROLE)));
-            user.setStatus(Status.valueOf(resultSet.getString(QueryParameter.STATUS)));
+//            user.setRole(Role.valueOf(resultSet.getString(QueryParameter.ROLE)));
+//            user.setStatus(Status.valueOf(resultSet.getString(QueryParameter.STATUS)));
 //            user.setBalance(resultSet.getInt(QueryParameter.BALANCE));
 //            user.setTime(resultSet.getTimestamp(QueryParameter.REGISTRATION_DATE));
 //            user.setLogin(resultSet.getString(QueryParameter.LOGIN));
@@ -156,10 +157,12 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
-
+//TODO role и статус лежат в таблице аккаунт
+//    или без них обходиться или двойной джойн и возвращать DTO
     @Override
     public User findUserByLogin(String login) throws DAOException {
-        //"SELECT auth_info_id, name, surname, address, phone, email, role, status FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?";
+        //"SELECT id, name, surname, address, phone, email FROM auth_info
+        // LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?";
         try {
             PreparedStatement statement = preparedStatementMap.get(FIND_USER_BY_LOGIN);
             statement.setString(1, login);
@@ -170,10 +173,26 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
-//TODO
+
+    //TODO
     @Override
     public AuthorizationInfo findUserAuthInfoByLogin(String login) throws DAOException {
-        return null;
+        //"SELECT auth_info_id, login, password FROM auth_info WHERE login = ?"
+        AuthorizationInfo info = new AuthorizationInfo();
+        try {
+            PreparedStatement statement = preparedStatementMap.get(FIND_AUTH_INFO_BY_LOGIN);
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String loginFromBD =resultSet.getString("login");
+                String password = resultSet.getString("password");
+                info = new AuthorizationInfo(loginFromBD, password);
+            }
+            return info;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException(e);
+        }
     }
 
     @Override
@@ -230,7 +249,7 @@ public class SQLUserDAO implements UserDAO {
 //    }
 
     @Override //возвращает количество таких логинов
-    public int isLoginExist(String login) throws DAOException {
+    public int isLoginUnique(String login) throws DAOException {
         PreparedStatement statement = preparedStatementMap.get(IS_LOGIN_EXIST);
         ResultSet resultSet = null;
         try {
@@ -253,9 +272,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(3, user.getPhone());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getAddress());
-            statement.setString(6, String.valueOf(user.getStatus()));
-            statement.setString(7, String.valueOf(user.getRole()));
-            statement.setLong(8, user.getId());
+            statement.setLong(6, user.getId());
             return statement.executeUpdate() == 1 ? user : new User();
         } catch (SQLException e) {
             logger.error("sql cant upd info");
@@ -279,23 +296,7 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    @Override //передавать id или всего юзера
-    public boolean updateStatus(Status status, User user) throws DAOException {
-        try {
-            PreparedStatement statement = preparedStatementMap.get(UPD_USER_STATUS_BY_ID);
-            statement.setString(1, String.valueOf(status));
-            statement.setLong(2, user.getId());
-            return statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new DAOException("can't upd active field");
-        }
-    }
 
-//    @Override //баланс теперь на аккунте
-//    public void updateUserBalanceById(int id, double balance) throws DAOException {
-//
-//    }
 
     @Override
     public boolean deleteUser(long id) throws DAOException {

@@ -24,7 +24,7 @@ public class SQLTariffDAO implements TariffDAO {
     private final static String ADD_TARIFF = "INSERT INTO tariffs (name, description, price, speed, discount) values (?,?,?,?,?);";
     private final static String GET_TARIFF_BY_ID = "SELECT name, price, speed, description  FROM tariffs WHERE id=?;";
     private final static String DEL_TARIFF_BY_ID = "DELETE  FROM tariffs WHERE id=?;";
-    private final static String GET_TARIFF_BY_USER_ID = "SELECT mytelecom.tariffs.*, mytelecom.tarif_note.create_time,mytelecom.tarif_note.id AS 'noteId'  FROM mytelecom.tarif, mytelecom.tarif_note WHERE mytelecom.tarif_note.tarif_id=mytelecom.tarif.id AND mytelecom.tarif_note.user_id=?;";
+    private final static String GET_TARIFF_BY_USER_ID = "SELECT tariffs.id as id, name, description, speed, price FROM tariffs JOIN tariff_notes ON tariffs.id = tariff_notes.tariff_id WHERE tariff_notes.account_id = ?;";
     private final static String GET_TARIFF_FROM_TO = "SELECT name, price, speed, description FROM tariffs LIMIT ? OFFSET ?;";
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 //"SELECT tariffs.name, tariffs.price, tariffs.speed, tariffs.description, mytelecom.tarif_note.create_time,mytelecom.tarif_note.id AS 'noteId'
@@ -67,7 +67,6 @@ public class SQLTariffDAO implements TariffDAO {
             tariff.setDescription(resultSet.getString(QueryParameter.DESCRIPTION));
             tariff.setPrice(resultSet.getBigDecimal(QueryParameter.PRICE));
             tariff.setSpeed(resultSet.getInt(QueryParameter.SPEED));
-
         } catch (SQLException e) {
             logger.error(e);
             throw new DAOException(e);
@@ -141,6 +140,26 @@ public class SQLTariffDAO implements TariffDAO {
             logger.error("can't delete tariff");
             throw new DAOException(e);
         }
+    }
+
+    @Override //Проблема не получим время подключения, но тогда надо возвращать DTO  или брать 2 запроса, что плохо
+    public List<Tariff> getTariffsByUserId(long id) throws DAOException {
+        //SELECT tariffs.id as id, name, description, speed, price
+       // FROM tariffs JOIN tariff_notes ON tariffs.id = tariff_notes.tariff_id WHERE tariff_notes.account_id = ?;
+        List<Tariff> tariffs = new ArrayList<>();
+        try {
+            PreparedStatement statement = preparedStatementMap.get(GET_TARIFF_FROM_TO);
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Tariff tariff = convertFromResultSet(resultSet);
+                tariffs.add(tariff);
+            }
+        } catch (SQLException e) {
+            logger.error(" can't get all tariffs");
+            throw new DAOException(e);
+        }
+        return tariffs;
     }
 
     @Override

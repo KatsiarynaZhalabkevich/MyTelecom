@@ -30,11 +30,11 @@ public class SQLPromotionDAO implements PromotionDAO {
             setPreparedStatement(connection, ADD_PROMO);
             setPreparedStatement(connection, UPDATE_PROMO);
             setPreparedStatement(connection, DEL_PROMO_BY_ID);
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);

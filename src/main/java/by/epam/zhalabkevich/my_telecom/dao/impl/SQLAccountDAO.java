@@ -1,6 +1,8 @@
 package by.epam.zhalabkevich.my_telecom.dao.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.Account;
+import by.epam.zhalabkevich.my_telecom.bean.Status;
+import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.dao.AccountDAO;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
@@ -23,6 +25,7 @@ public class SQLAccountDAO implements AccountDAO {
     private static final String UPD_ACCOUNT = "UPDATE accounts SET balance = ?, registration_date = ? WHERE id = ?;";
     private static final String DEL_ACCOUNT = "DELETE FROM accounts WHERE id = ?;";
     private static final String GET_ACCOUNT_BY_ID = "SELECT balance, registration_date FROM accounts WHERE id = ?;";
+    private final static String UPD_USER_STATUS_BY_ID = "UPDATE accounts SET status=? WHERE id=?";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
@@ -32,10 +35,10 @@ public class SQLAccountDAO implements AccountDAO {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, ADD_ACCOUNT);
             setPreparedStatement(connection, UPD_ACCOUNT);
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
-            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
+//            setPreparedStatement(connection, "");
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
@@ -121,5 +124,24 @@ public class SQLAccountDAO implements AccountDAO {
             throw new DAOException(e);
         }
         return account;
+    }
+
+    @Override
+    public void updateUserBalanceById(int id, double balance) throws DAOException {
+
+    }
+
+    //статус в аккаунте
+    @Override //передавать id или всего юзера
+    public boolean updateStatus(Status status, User user) throws DAOException {
+        try {
+            PreparedStatement statement = preparedStatementMap.get(UPD_USER_STATUS_BY_ID);
+            statement.setString(1, String.valueOf(status));
+            statement.setLong(2, user.getId());
+            return statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException("can't upd active field");
+        }
     }
 }
