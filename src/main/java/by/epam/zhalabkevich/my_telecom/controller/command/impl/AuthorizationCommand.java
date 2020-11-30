@@ -5,6 +5,8 @@ import by.epam.zhalabkevich.my_telecom.bean.Role;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.controller.JSPPageName;
 import by.epam.zhalabkevich.my_telecom.controller.command.Command;
+import by.epam.zhalabkevich.my_telecom.controller.util.Pagination;
+import by.epam.zhalabkevich.my_telecom.service.AccountService;
 import by.epam.zhalabkevich.my_telecom.service.ServiceException;
 import by.epam.zhalabkevich.my_telecom.service.ServiceProvider;
 import by.epam.zhalabkevich.my_telecom.service.UserService;
@@ -20,6 +22,7 @@ import java.io.IOException;
 public class AuthorizationCommand implements Command {
     private final static Logger logger = LogManager.getLogger();
     private final UserService userService = ServiceProvider.getInstance().getUserService();
+    private final AccountService accountService = ServiceProvider.getInstance().getAccountService();
     /*перенести все в один класс???*/
     private final static String LOGIN = "login";
     private final static String PASSWORD = "password";
@@ -43,28 +46,21 @@ public class AuthorizationCommand implements Command {
      */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         String login = request.getParameter(LOGIN);
         String password = request.getParameter(PASSWORD);
         String goToPage = JSPPageName.INDEX_PAGE;
         AuthorizationInfo info = new AuthorizationInfo(login, password);
-        // TariffService tariffService = ServiceProvider.getInstance().getTariffService();
-
         HttpSession session = request.getSession(true);
 
-
         try {
-            System.out.println("user service "+userService);
+            System.out.println("user service " + userService);
             User user = userService.authorize(info);
             if (!user.equals(new User())) {
                 session.setAttribute(USER, user);
                 //TODO добавить тарифы и продумать пагинацию
-//               List<UserTarif> tariffs = tarifService.showTarifsByUserId(user.getId()); //все тарифы какие есть
-//               session.setAttribute(USER_TARIFFS, tariffs);
-//               Pagination.makePage(request);
-              goToPage =  Role.ADMIN.equals(user.getRole()) ? JSPPageName.ADMIN_PAGE : JSPPageName.USER_AUTH_PAGE;
-
-            }else{
+                Pagination.makeTariffPage(request);
+                goToPage = Role.ADMIN.equals(accountService.checkRoleByUserId(user.getId())) ? JSPPageName.ADMIN_PAGE : JSPPageName.USER_AUTH_PAGE;
+            } else {
                 session.setAttribute(LOGIN_ERROR_MESSAGE, LOGIN_ERROR_MESSAGE_TEXT); //request
                 goToPage = JSPPageName.INDEX_PAGE;
             }
@@ -74,6 +70,6 @@ public class AuthorizationCommand implements Command {
         }
         request.getRequestDispatcher(goToPage).forward(request, response);
 
-}
+    }
 
 }

@@ -12,8 +12,6 @@ public class User implements Serializable {
     private String phone;
     private String email;
     private String address;
-    private Role role = Role.USER;
-    private Status status = Status.BLOCKED;
 
     public User() {
     }
@@ -74,21 +72,6 @@ public class User implements Serializable {
         this.address = address;
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     @Override
     public boolean equals(Object o) {

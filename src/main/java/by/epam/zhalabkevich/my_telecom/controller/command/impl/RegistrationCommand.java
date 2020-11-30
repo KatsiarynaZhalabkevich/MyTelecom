@@ -5,6 +5,7 @@ import by.epam.zhalabkevich.my_telecom.bean.Tariff;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.controller.JSPPageName;
 import by.epam.zhalabkevich.my_telecom.controller.command.Command;
+import by.epam.zhalabkevich.my_telecom.controller.util.Pagination;
 import by.epam.zhalabkevich.my_telecom.service.ServiceException;
 import by.epam.zhalabkevich.my_telecom.service.ServiceProvider;
 import by.epam.zhalabkevich.my_telecom.service.TariffService;
@@ -41,8 +42,7 @@ public class RegistrationCommand implements Command {
     private final static String ERROR_MESSAGE_TEXT = "Can't register a new user. Please, try again.";
     private final static String ERROR_LOGIN_MESSAGE_TEXT = "Login already exist!";
     private final static String ERROR_PASSWORD_MESSAGE_TEXT = "Passwords are not equal!!!";
-    private int LIMIT = 3;
-
+//TODO send email to activate account
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
@@ -62,10 +62,8 @@ public class RegistrationCommand implements Command {
         if (!password1.equals("") && !password1.equals(" ") && password1.equals(password2)) {
             try {
                 User userFromDB = userService.register(info, user);
-                //TODO создание аккаунта тоже в момент регистрации
-                //TODO подтянуть тарифы на страницу
-                List<Tariff> tariffList = tariffService.showTariffRange(1, LIMIT);
-                session.setAttribute(TARIFFS, tariffList); //хранить в реквесте, чтобы не таскать за собой???
+                //TODO jsp pagination
+                Pagination.makeTariffPage(request);
                 session.setAttribute(USER, userFromDB);
                 goToPage = JSPPageName.USER_AUTH_PAGE;
             } catch (ServiceException e) { //из сервисов приходят понятные сообщения

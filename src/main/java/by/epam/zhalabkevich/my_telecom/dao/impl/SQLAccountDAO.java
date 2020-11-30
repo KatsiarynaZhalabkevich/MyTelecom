@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.dao.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.Account;
+import by.epam.zhalabkevich.my_telecom.bean.Role;
 import by.epam.zhalabkevich.my_telecom.bean.Status;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.dao.AccountDAO;
@@ -11,6 +12,7 @@ import by.epam.zhalabkevich.my_telecom.dao.util.QueryParameter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -27,19 +29,23 @@ public class SQLAccountDAO implements AccountDAO {
     private static final String GET_ACCOUNT_BY_ID = "SELECT balance, registration_date FROM accounts WHERE id = ?;";
     private final static String UPD_USER_STATUS_BY_ID = "UPDATE accounts SET status=? WHERE user_id=?";
     private static final String UPD_BALANCE_BY_USER_ID = "UPDATE accounts SET balance = ? WHERE user_id = ?;" ;
+    private static final String UPD_USER_ROLE_BY_ID = "UPDATE accounts SET role=? WHERE user_id=?" ;
+    private static final String GET_STATUS_BY_USER_ID = "SELECT  status FROM accounts WHERE user_id = ?;";
+    private static final String GET_ROLE_BY_USER_ID = "SELECT  role FROM accounts WHERE user_id = ?;";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
     public SQLAccountDAO() {
-        Connection connection = null;
+        Connection connection;
         try {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, ADD_ACCOUNT);
             setPreparedStatement(connection, UPD_ACCOUNT);
             setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
             setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
-//            setPreparedStatement(connection, "");
-//            setPreparedStatement(connection, "");
+            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
+           setPreparedStatement(connection, GET_STATUS_BY_USER_ID);
+            setPreparedStatement(connection, GET_ROLE_BY_USER_ID);
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
@@ -129,7 +135,7 @@ public class SQLAccountDAO implements AccountDAO {
     }
 
     @Override //баланс сразу исходная сумма
-    public boolean updateBalanceByUserId(long id, double balance) throws DAOException {
+    public boolean updateBalanceByUserId(long id, BigDecimal balance) throws DAOException {
         //UPDATE accounts SET balance = ? WHERE user_id = ?;
         try {
             PreparedStatement statement = preparedStatementMap.get(UPD_BALANCE_BY_USER_ID);
@@ -138,7 +144,7 @@ public class SQLAccountDAO implements AccountDAO {
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             logger.error(e);
-            throw new DAOException("Impossible to update user balance");
+            throw new DAOException(e);
         }
 
     }
@@ -155,5 +161,60 @@ public class SQLAccountDAO implements AccountDAO {
             logger.error(e);
             throw new DAOException("Impossible to update user's status");
         }
+    }
+
+    @Override
+    public boolean updateRole(Role role, long id) throws DAOException {
+        try {
+            PreparedStatement statement = preparedStatementMap.get(UPD_USER_ROLE_BY_ID);
+            statement.setString(1, String.valueOf(role));
+            statement.setLong(2, id);
+            return statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException("Impossible to update user's role");
+        }
+    }
+
+    @Override
+    public Status getStatusByUserId(long id) throws DAOException {
+        //SELECT  status FROM accounts WHERE user_id = ?;
+       Status status = null;
+        try {
+            PreparedStatement statement = preparedStatementMap.get(GET_STATUS_BY_USER_ID);
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                status = Status.valueOf(resultSet.getString(QueryParameter.STATUS));
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+            logger.error("SQL problem with getting status");
+            throw new DAOException(e);
+        }
+        return status;
+    }
+
+    @Override
+    public Role getRoleByUserId(long id) throws DAOException {
+        Role role = null;
+        try {
+            PreparedStatement statement = preparedStatementMap.get(GET_ROLE_BY_USER_ID);
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                role = Role.valueOf(resultSet.getString(QueryParameter.ROLE));
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+            logger.error("SQL problem with getting role");
+            throw new DAOException(e);
+        }
+        return role;
+    }
+
+    @Override
+    public BigDecimal getBalanceByUserId(long id) throws DAOException {
+        return BigDecimal.valueOf(10000);
     }
 }

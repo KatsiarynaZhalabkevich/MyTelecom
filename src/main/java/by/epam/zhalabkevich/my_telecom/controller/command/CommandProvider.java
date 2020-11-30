@@ -15,10 +15,15 @@ public class CommandProvider {
         commands.put(CommandName.NO_SUCH_COMMAND, new NoSuchCommand());
         commands.put(CommandName.EDIT_PROFILE, new EditProfileCommand());
         commands.put(CommandName.UPDATE_PASSWORD, new UpdateUserPasswordCommand());
+        commands.put(CommandName.UPDATE_PROMOTION, new UpdatePromotionCommand());
+        commands.put(CommandName.CREATE_PROMOTION, new CreatePromotionCommand());
+        commands.put(CommandName.DELETE_PROMOTION, new DeletePromotionCommand());
+        commands.put(CommandName.ADD_PROMOTION_TO_TARIFF, new AddPromotionToTariffCommand());
+        commands.put(CommandName.SHOW_PROMOTIONS, new ShowPromotionsCommand());
 //        commands.put(CommandName.CREATE_USER, new CreateUserCommand());
 //        commands.put(CommandName.UPDATE_USER, new UpdateUserCommand());
         commands.put(CommandName.LOGOUT, new LogOutCommand());
-//        commands.put(CommandName.SHOW_TARIFFS, new ShowTariffsCommand());
+        commands.put(CommandName.SHOW_TARIFFS, new ShowTariffsCommand());
 //        commands.put(CommandName.UPDATE_BALANCE, new UpdateBalanceCommand());
 //        commands.put(CommandName.SHOW_USERS, new ShowUsersCommand());
 //        commands.put(CommandName.ADD_NOTE, new AddNoteCommand());

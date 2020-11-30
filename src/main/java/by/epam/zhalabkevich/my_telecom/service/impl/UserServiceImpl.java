@@ -15,14 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-/*
- * save new user
- * 1. is login uniq
- * 2. save auth info
- * 3. save User
- * 4. create account
- *
- * */
 public class UserServiceImpl implements UserService {
     private final static Logger logger = LogManager.getLogger();
     private final DAOProvider provider = DAOProvider.getInstance();
