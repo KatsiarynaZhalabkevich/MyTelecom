@@ -2,6 +2,7 @@ package by.epam.zhalabkevich.my_telecom.service.util;
 
 import by.epam.zhalabkevich.my_telecom.bean.Promotion;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -23,7 +24,7 @@ public class PromotionDataValidator {
         return description != null && description.length() > 30;
     }
 
-    public static boolean checkDates(LocalDateTime dateStart, LocalDateTime dateEnd) {
+    public static boolean checkDates(LocalDate dateStart, LocalDate dateEnd) {
         return dateStart.isBefore(dateEnd);
     }
 

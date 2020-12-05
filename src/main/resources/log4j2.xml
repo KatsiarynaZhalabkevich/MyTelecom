@@ -19,7 +19,7 @@
             </Policies>
         </RollingFile>
 
-        <File name="File1" fileName="src/logs/text.log" append="false" >
+        <File name="File1" fileName="src/logs/text.log" append="true" >
             <PatternLayout pattern="${pattern_console}"/>
         </File>
 
@@ -37,7 +37,7 @@
             <AppenderRef ref="File1"/>
         </Logger>
 
-        <Root level="debug" additivity="false">
+        <Root level="debug" additivity="true">
             <appender-ref ref="Console"/>
             <AppenderRef ref="File1"/>
         </Root>

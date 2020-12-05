@@ -6,14 +6,11 @@ import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.UserDAO;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPoolException;
-import by.epam.zhalabkevich.my_telecom.dao.util.QueryParameter;
+import by.epam.zhalabkevich.my_telecom.dao.util.Converter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,19 +19,16 @@ import java.util.Map;
 public class SQLUserDAO implements UserDAO {
 
     private final static Logger logger = LogManager.getLogger();
-
+    private final Converter converter = Converter.getConverter();
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
-    //+
     private final static String FIND_USER_BY_LOGIN = "SELECT users.id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?;";
-    //+
     private final static String ADD_USER_AUTH_INFO = "INSERT INTO auth_info (login, password) value (?, ?)";
-    //+
-    private final static String ADD_USER = "INSERT INTO users (name, surname, phone, email, address, id) value (?,?,?,?,?,?);";
+    private final static String ADD_USER = "INSERT INTO users (name, surname, phone, email, address, id, auth_info_id) value (?, ?,?,?,?,?,?);";
     private final static String FIND_AUTH_INFO_BY_LOGIN = "SELECT login, password FROM auth_info WHERE login = ?";
     private final static String FIND_USER_BY_ID = "SELECT id, name, surname, address, phone, email FROM  users WHERE user.id=?;";
-    private final static String IS_LOGIN_EXIST = "SELECT COUNT(login) FROM auth_info WHERE login=?;";
+    private final static String IS_LOGIN_EXIST = "SELECT COUNT(*) FROM auth_info WHERE login=?;";
     private final static String UPD_USER_INFO = "UPDATE users SET name=?, surname=?, phone=?, email=?, address=? WHERE id = ?;";
-    private final static String UPD_PASS_BY_ID = "UPDATE auth_info SET password=? WHERE id=?;"; //+
+    private final static String UPD_PASS_BY_ID = "UPDATE auth_info SET password=? WHERE id=?;";
     private final static String GET_PASS_BY_ID = "SELECT password FROM auth_info WHERE id=?";
     private final static String DELETE_USER_BY_ID = "DELETE  FROM auth_info WHERE id=?;";
 
@@ -67,30 +61,6 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    private User convertResultSet(ResultSet resultSet) throws DAOException {
-        User user = new User();
-        try {
-            user.setId(resultSet.getLong(QueryParameter.ID));
-            user.setName(resultSet.getString(QueryParameter.NAME));
-            user.setSurname(resultSet.getString(QueryParameter.SURNAME));
-            user.setPhone(resultSet.getString(QueryParameter.PHONE));
-            user.setEmail(resultSet.getString(QueryParameter.EMAIL));
-            user.setAddress(resultSet.getString(QueryParameter.ADDRESS));
-//            user.setRole(Role.valueOf(resultSet.getString(QueryParameter.ROLE)));
-//            user.setStatus(Status.valueOf(resultSet.getString(QueryParameter.STATUS)));
-//            user.setBalance(resultSet.getInt(QueryParameter.BALANCE));
-//            user.setTime(resultSet.getTimestamp(QueryParameter.REGISTRATION_DATE));
-//            user.setLogin(resultSet.getString(QueryParameter.LOGIN));
-//            user.setPassword(resultSet.getString(QueryParameter.PASSWORD));
-            return user;
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new DAOException(e);
-        }
-
-    }
-
-
     private void setPreparedStatement(Connection connection, String sql) throws DAOException {
         if (connection != null) {
             try {
@@ -103,7 +73,6 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    //нужна ли транзакция на уровне серисов для создания нового юзера пароль + данные
     @Override
     public User addUser(User user) throws DAOException {
 
@@ -115,6 +84,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getAddress());
             statement.setLong(6, user.getId());
+            statement.setLong(7, user.getId());
             return statement.executeUpdate() == 1 ? user : new User();
 
         } catch (SQLException e) {
@@ -125,10 +95,11 @@ public class SQLUserDAO implements UserDAO {
 
     }
 
-    @Override //записали логин и пароль
+    @Override
     public Long addAuthInfo(AuthorizationInfo info) throws DAOException {
         try {
-            PreparedStatement statement = preparedStatementMap.get("INSERT INTO auth_info (login, password) value (?, ?);");
+            Connection connection = ConnectionPool.getInstance().takeConnection();
+            PreparedStatement statement = connection.prepareStatement(ADD_USER_AUTH_INFO, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, info.getLogin());
             statement.setString(2, info.getPassword());
             if (statement.executeUpdate() == 1) {
@@ -149,13 +120,14 @@ public class SQLUserDAO implements UserDAO {
             PreparedStatement statement = preparedStatementMap.get(FIND_USER_BY_ID);
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            return resultSet.next() ? convertResultSet(resultSet) : new User();
+            return resultSet.next() ? converter.convertUserFromResultSet(resultSet) : new User();
         } catch (SQLException e) {
             logger.error("cant get data by id");
             throw new DAOException(e);
         }
     }
-//TODO role и статус лежат в таблице аккаунт
+
+    //TODO role и статус лежат в таблице аккаунт
 //    или без них обходиться или двойной джойн и возвращать DTO
     @Override
     public User findUserByLogin(String login) throws DAOException {
@@ -165,7 +137,7 @@ public class SQLUserDAO implements UserDAO {
             PreparedStatement statement = preparedStatementMap.get(FIND_USER_BY_LOGIN);
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
-            return resultSet.next() ? convertResultSet(resultSet) : new User();
+            return resultSet.next() ? converter.convertUserFromResultSet(resultSet) : new User();
         } catch (SQLException e) {
             logger.error(e);
             throw new DAOException(e);
@@ -182,7 +154,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                String loginFromBD =resultSet.getString("login");
+                String loginFromBD = resultSet.getString("login");
                 String password = resultSet.getString("password");
                 info = new AuthorizationInfo(loginFromBD, password);
             }
@@ -201,7 +173,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setString(1, info.getLogin());
             statement.setString(2, info.getPassword());
             ResultSet resultSet = statement.executeQuery();
-            return resultSet.next() ? convertResultSet(resultSet) : new User();
+            return resultSet.next() ? converter.convertUserFromResultSet(resultSet) : new User();
         } catch (SQLException e) {
             logger.error(e);
             throw new DAOException(e);
@@ -217,7 +189,7 @@ public class SQLUserDAO implements UserDAO {
             statement.setInt(2, firstPosition);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                users.add(convertResultSet(resultSet));
+                users.add(converter.convertUserFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             logger.error(" can't get all users");
@@ -229,9 +201,10 @@ public class SQLUserDAO implements UserDAO {
     @Override //возвращает количество таких логинов
     public int isLoginUnique(String login) throws DAOException {
         PreparedStatement statement = preparedStatementMap.get(IS_LOGIN_EXIST);
-        ResultSet resultSet;
+
         try {
-            resultSet = statement.executeQuery();
+            statement.setString(1, login);
+            ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getInt(1);
         } catch (SQLException e) {
@@ -258,7 +231,7 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    @Override //передавать всего юзера или id
+    @Override
     public boolean updatePassword(String newPassword, User user) throws DAOException {
         //  UPDATE auth_info SET password=? WHERE id=?;
         try { //password уже зашифрован

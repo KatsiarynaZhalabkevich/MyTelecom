@@ -29,7 +29,7 @@
     <title>${error}</title>
 </head>
 <body>
-<c:import url="../import/header.jsp"/>
+<c:import url="/header"/>
 
 <div class="jumbotron">
     <div class="container">
@@ -52,6 +52,6 @@
 
 
 
-<c:import url="../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

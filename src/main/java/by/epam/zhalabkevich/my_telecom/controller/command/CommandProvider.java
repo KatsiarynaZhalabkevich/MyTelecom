@@ -20,12 +20,15 @@ public class CommandProvider {
         commands.put(CommandName.DELETE_PROMOTION, new DeletePromotionCommand());
         commands.put(CommandName.ADD_PROMOTION_TO_TARIFF, new AddPromotionToTariffCommand());
         commands.put(CommandName.SHOW_PROMOTIONS, new ShowPromotionsCommand());
+        commands.put(CommandName.SHOW_USER_INFO, new ShowUserInfo());
+        commands.put(CommandName.UPDATE_USER_INFO, new UpdateUserInfoCommand());
 //        commands.put(CommandName.CREATE_USER, new CreateUserCommand());
 //        commands.put(CommandName.UPDATE_USER, new UpdateUserCommand());
         commands.put(CommandName.LOGOUT, new LogOutCommand());
         commands.put(CommandName.SHOW_TARIFFS, new ShowTariffsCommand());
-//        commands.put(CommandName.UPDATE_BALANCE, new UpdateBalanceCommand());
-//        commands.put(CommandName.SHOW_USERS, new ShowUsersCommand());
+        commands.put(CommandName.UPDATE_BALANCE, new UpdateBalanceCommand());
+        commands.put(CommandName.GO_TO_PAGE, new GoToPageCommand());
+        commands.put(CommandName.SHOW_USERS, new ShowUsersCommand());
 //        commands.put(CommandName.ADD_NOTE, new AddNoteCommand());
 //        commands.put(CommandName.DELETE_NOTE, new DeleteNoteCommand());
 //        commands.put(CommandName.CHANGE_BALANCE, new ChangeBalanceCommand());
@@ -37,21 +40,21 @@ public class CommandProvider {
 //        commands.put(CommandName.SHOW_USER_TARIFF, new ShowUserTariffsCommand());
 //        commands.put(CommandName.PAYMENT, new PaymentCommand());
 //        commands.put(CommandName.BLOCK, new BlockCommand());
-//        commands.put(CommandName.TARIFF_PAGINATION, new TariffPaginationCommand());
 //        commands.put(CommandName.STATISTIC, new StatisticCommand());
-//        commands.put(CommandName.USER_PAGINATION, new UserPaginationCommand());
+
 
     }
 
     public static CommandProvider getInstance() {
         return instance;
     }
-    public Command getCommand (String commandName) {
+
+    public Command getCommand(String commandName) {
         CommandName name = CommandName.valueOf(commandName.toUpperCase());
         Command command;
         if (null != name) {
             command = commands.get(name);
-        }else {
+        } else {
             command = commands.get(CommandName.NO_SUCH_COMMAND);
         }
         return command;

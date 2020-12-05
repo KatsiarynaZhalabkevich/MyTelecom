@@ -25,8 +25,9 @@ public class Pagination {
     private static final String USERS = "users";
 
     //TODO переписать методы в один через <>
-    public static List<?> makePage(Service service, int offset, int limit) throws ServiceException {
+    public static List<?> makePage(Service service, int page, int limit) throws ServiceException {
         List<?> list = new ArrayList<>();
+        int offset = page*limit - limit;
 
         if (service.equals(Service.TARIFF)) {
             TariffService tariffService = provider.getTariffService();

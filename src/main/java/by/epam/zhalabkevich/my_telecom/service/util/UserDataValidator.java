@@ -56,7 +56,8 @@ public class UserDataValidator {
     public boolean checkPhone(String phone) {
         String regExp = "^\\+?(\\d{1,3})?[- .]?\\(?(?:\\d{2,3})\\)?[- .]?\\d\\d\\d[- .]?\\d\\d\\d\\d$";
 
-        return phone != null && phone.matches(regExp);
+       // return phone != null && phone.matches(regExp);
+        return true;
     }
 
     public boolean checkEmail(String email) {

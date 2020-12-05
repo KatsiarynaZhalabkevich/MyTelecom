@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UpdatePromotionCommand implements Command {
@@ -40,8 +41,8 @@ public class UpdatePromotionCommand implements Command {
         User admin = (User) session.getAttribute(USER);
         long promotionId = (long) request.getAttribute(ID);
         String description = request.getAttribute(DESCRIPTION).toString();
-        LocalDateTime dateStart = (LocalDateTime) request.getAttribute(DATE_START);
-        LocalDateTime dateEnd = (LocalDateTime) request.getAttribute(DATE_END);
+        LocalDate dateStart = (LocalDate) request.getAttribute(DATE_START);
+        LocalDate dateEnd = (LocalDate) request.getAttribute(DATE_END);
         double discount = (double) request.getAttribute(DISCOUNT);
         Promotion promotion = new Promotion(promotionId, description, dateStart, dateEnd, discount);
 

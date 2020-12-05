@@ -22,17 +22,21 @@ public class UserServiceImpl implements UserService {
     private final AccountDAO accountDAO = provider.getAccountDAO();
     private final UserDataValidator validator = UserDataValidator.getInstance();
 
-//TODO выбрасывать исключение с описанием ошибки или возвращать пустого пользователя?
     public User register(AuthorizationInfo info, User user) throws ServiceException {
         if (isLoginUniq(info.getLogin()) == 0) {
+            logger.debug("login uniq");
             if (validator.checkPassword(info.getPassword())) {
                 String passHash = PasswordCreater.createPassword(info.getPassword());
                 info.setPassword(passHash);
                 if (validator.userValidate(user)) {
                     try {
                         user.setId(userDAO.addAuthInfo(info));
+                        logger.debug("auth info created");
+                        User userFromDB = userDAO.addUser(user);
+                        logger.debug("user created");
                         accountDAO.addAccount(user.getId());
-                       return userDAO.addUser(user);
+                        logger.debug("account created");
+                        return userFromDB;
                     } catch (DAOException e) {
                         logger.error(e);
                         throw new ServiceException("Impossible register a new user");
@@ -49,26 +53,21 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override //может быть возвращать аккаунт?
+    @Override
     public User authorize(AuthorizationInfo info) throws ServiceException {
         try {
             AuthorizationInfo infoFromDB = userDAO.findUserAuthInfoByLogin(info.getLogin());
-            System.out.println("user info"+info);
-            System.out.println("info from DB"+infoFromDB);
-            return PasswordCreater.verifyPassword(info.getPassword(), infoFromDB.getPassword())?
-                    userDAO.findUserByLogin(infoFromDB.getLogin()): new User();
+            return PasswordCreater.verifyPassword(info.getPassword(), infoFromDB.getPassword()) ?
+                    userDAO.findUserByLogin(infoFromDB.getLogin()) : new User();
         } catch (DAOException e) {
             logger.error(e);
             throw new ServiceException("Impossible to authorize user");
         }
     }
-    //чтобы зарегистрировать нового пользователя у него должен быть логин пароль + инфо с обязательным email
-    //при сохранении логина и пароля создаем юзера и туда сеттаем id? на следующем этапе заполняем все другие поля
-    //
-//TODO всегда будет один и тот же сценарий, тк user регистрируется в другом месте
+
     @Override
     public User saveUpdateUser(User user) throws ServiceException {
-        if(validator.userValidate(user)){
+        if (validator.userValidate(user)) {
             try {
                 if (user.getId() > 0) {
                     return userDAO.updateUserInfo(user);
@@ -79,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 logger.error(e);
                 throw new ServiceException("Impossible to save or update user");
             }
-        }else{
+        } else {
             throw new ServiceException("Some fields are not valid");
         }
     }
@@ -130,14 +129,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updatePassword(String newPassword, User user) throws ServiceException {
-        if(validator.checkPassword(newPassword)){
+        if (validator.checkPassword(newPassword)) {
+            String cryptPass = PasswordCreater.createPassword(newPassword);
             try {
-              return userDAO.updatePassword(newPassword, user);
+                return userDAO.updatePassword(cryptPass, user);
             } catch (DAOException e) {
                 logger.error(e);
-                throw  new ServiceException("Impossible to update password");
+                throw new ServiceException("Impossible to update password");
             }
-        }else{
+        } else {
             throw new ServiceException("New password is not valid");
         }
 

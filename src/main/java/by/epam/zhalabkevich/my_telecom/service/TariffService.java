@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.service;
 
 import by.epam.zhalabkevich.my_telecom.bean.Tariff;
+import by.epam.zhalabkevich.my_telecom.bean.dto.TariffNote;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface TariffService {
 
     boolean changeTariff(Tariff tariff) throws ServiceException;
 
-    // List<UserTariff> showTariffsByUserId(int id) throws ServiceException;
+    List<TariffNote> showUserTariffsByAccountId(long id) throws ServiceException;
 
     List<Tariff> showTariffRange(int page, int limit) throws ServiceException;
 

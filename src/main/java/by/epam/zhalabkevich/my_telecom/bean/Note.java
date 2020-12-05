@@ -1,13 +1,14 @@
 package by.epam.zhalabkevich.my_telecom.bean;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Note implements Serializable {
     private final static long serialVersionUID = 3L;
     private long id;
-    private LocalDateTime connectionDate;
+    private LocalDate connectionDate;
 
 
     public Note() {
@@ -21,11 +22,11 @@ public class Note implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getConnectionDate() {
+    public LocalDate getConnectionDate() {
         return connectionDate;
     }
 
-    public void setConnectionDate(LocalDateTime connectionDate) {
+    public void setConnectionDate(LocalDate connectionDate) {
         this.connectionDate = connectionDate;
     }
 

@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.service.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.Tariff;
+import by.epam.zhalabkevich.my_telecom.bean.dto.TariffNote;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.DAOProvider;
 import by.epam.zhalabkevich.my_telecom.dao.TariffDAO;
@@ -50,6 +51,15 @@ public class TariffServiceImpl implements TariffService {
             return dao.editTariff(tariff);
         } catch (DAOException e) {
             throw new ServiceException("Impossible to update tariff info");
+        }
+    }
+
+    @Override
+    public List<TariffNote> showUserTariffsByAccountId(long id) throws ServiceException {
+        try {
+            return dao.getUsersTariffsWithAdditionalInfoByAccountId(id);
+        } catch (DAOException e) {
+            throw new ServiceException("Impossible to get tariffs for user");
         }
     }
 

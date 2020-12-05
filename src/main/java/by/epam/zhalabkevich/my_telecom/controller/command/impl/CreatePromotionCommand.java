@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CreatePromotionCommand implements Command {
@@ -35,8 +36,8 @@ public class CreatePromotionCommand implements Command {
         HttpSession session = request.getSession();
         User admin = (User) session.getAttribute(USER);
         String description = request.getAttribute(DESCRIPTION).toString();
-        LocalDateTime dateStart = (LocalDateTime) request.getAttribute(DATE_START);
-        LocalDateTime dateEnd = (LocalDateTime) request.getAttribute(DATE_END);
+        LocalDate dateStart = (LocalDate) request.getAttribute(DATE_START);
+        LocalDate dateEnd = (LocalDate) request.getAttribute(DATE_END);
         double discount = (double) request.getAttribute(DISCOUNT);
         Promotion promotion = new Promotion(-1, description, dateStart, dateEnd, discount);
         String goToPage = JSPPageName.ERROR_PAGE;

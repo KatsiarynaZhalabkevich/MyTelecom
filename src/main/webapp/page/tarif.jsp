@@ -40,15 +40,13 @@
 </head>
 <body>
 
-<c:import url="../import/header.jsp"/>
+<c:import url="/header"/>
 
 
 <div class="jumbotron">
     <div class="container">
         <br>
-
         <p>${mess1} </p>
-
     </div>
 </div>
 <div class="table-responsive">
@@ -58,24 +56,23 @@
                 <c:if test="${requestScope.tariffNumPage>1}">
                     <form action="controller" method="get">
                         <input type="hidden" name="command" value="show_tariffs"/>
-                        <input type="hidden" name="pageNum" value="${requestScope.tariffNumPage-1}" >
+                        <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage-1}" >
                         <input type="submit" class="btn-link" style="color: black" value="${prev}"/>
-                        <c:set scope="request" var="tariffNumPage" value="${requestScope.tariffNumPage-1}"/>
+
                     </form>
                 </c:if>
             </td>
             <td>
-                <form action="#">
-                    <input type="submit" class="btn-link" style="color: black" value="${requestScope.tariffNumPage}">
-                </form>
+                    <input type="text" class="btn-link"  style="color: black" value="${requestScope.tariffNumPage}">
+
             </td>
             <td>
                 <c:if test="${!requestScope.isLastPageTariff}">
                     <form action="controller" method="get">
                         <input type="hidden" name="command" value="show_tariffs"/>
-                        <input type="hidden" name="pageNum" value="${requestScope.tariffNumPage+1}" >
+                        <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage+1}" >
                         <input type="submit" class="btn-link" style="color: black" value="${next}"/>
-                        <c:set scope="request" var="tariffNumPage" value="${requestScope.tariffNumPage+1}"/>
+
                     </form>
                 </c:if>
             </td>
@@ -90,7 +87,6 @@
             <th>${descr}</th>
             <th>${speed}</th>
             <th>${price}, $</th>
-            <th>${discount}</th>
             <th></th>
         </tr>
 
@@ -98,6 +94,6 @@
         <mytag:tariff list="${sessionScope.userbean}" num="${sessionScope.userbean.size}"/>
     </table>
 </div>
-<c:import url="/../footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

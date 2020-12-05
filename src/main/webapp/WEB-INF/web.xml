@@ -61,7 +61,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>tariff</servlet-name>
-        <url-pattern>/tariff_admin</url-pattern>
+        <url-pattern>/admin/tariffs</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>statistic</servlet-name>
@@ -77,7 +77,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>user_tariff</servlet-name>
-        <url-pattern>/user_tariff</url-pattern>
+        <url-pattern>/users/user/tariffs</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -115,6 +115,23 @@
     <servlet-mapping>
         <servlet-name>customtag</servlet-name>
         <url-pattern>/customtag</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>header</servlet-name>
+        <jsp-file>/import/header.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>header</servlet-name>
+        <url-pattern>/header</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>footer</servlet-name>
+        <jsp-file>/import/footer.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>footer</servlet-name>
+        <url-pattern>/footer</url-pattern>
     </servlet-mapping>
 
 

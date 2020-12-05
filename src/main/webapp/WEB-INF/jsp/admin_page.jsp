@@ -5,7 +5,7 @@
 <html>
 <head>
     <fmt:setLocale value="${sessionScope.local}" />
-    <fmt:setBundle basename="localization.local" var="loc" />
+    <fmt:setBundle basename="local" var="loc" />
 
     <fmt:message bundle="${loc}" key="local.mainpage" var="main"/>
     <fmt:message bundle="${loc}" key="local.registration" var="registr"/>
@@ -43,7 +43,7 @@
 </head>
 <body>
 
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 <div class="container"><h3 align="right" ><mytag:date/></h3></div>
 
 <div class="jumbotron">
@@ -78,7 +78,7 @@
                 <p>${mes5admin}</p>
                 <p>
                 <form action="controller" method="get">
-                    <input type="hidden" name="command" value="show_tarifs"/>
+                    <input type="hidden" name="command" value="show_tariffs"/>
                     <input class="btn btn-info btn-md" type="submit" value="${buttarif} &raquo;"/>
 
                 </form>
@@ -107,6 +107,6 @@
 <br>
 <br>
 
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.bean;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -9,14 +10,14 @@ public class Promotion implements Serializable {
     private final static long serialVersionUID = 6L;
     private long id;
     private String description;
-    private LocalDateTime dateStart;
-    private LocalDateTime dateEnd;
+    private LocalDate dateStart;
+    private LocalDate dateEnd;
     private double discount;
 
     public Promotion() {
     }
 
-    public Promotion(long id, String description, LocalDateTime dateStart, LocalDateTime dateEnd, double discount) {
+    public Promotion(long id, String description, LocalDate dateStart, LocalDate dateEnd, double discount) {
         this.id = id;
         this.description = description;
         this.dateStart = dateStart;
@@ -40,19 +41,19 @@ public class Promotion implements Serializable {
         this.description = description;
     }
 
-    public LocalDateTime getDateStart() {
+    public LocalDate getDateStart() {
         return dateStart;
     }
 
-    public void setDateStart(LocalDateTime dateStart) {
+    public void setDateStart(LocalDate dateStart) {
         this.dateStart = dateStart;
     }
 
-    public LocalDateTime getDateEnd() {
+    public LocalDate getDateEnd() {
         return dateEnd;
     }
 
-    public void setDateEnd(LocalDateTime dateEnd) {
+    public void setDateEnd(LocalDate dateEnd) {
         this.dateEnd = dateEnd;
     }
 

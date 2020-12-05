@@ -1,4 +1,5 @@
 function valid(form) {
+    console.log("inside validation js");
     let fail = false;
     let login = form.login.value;
     let password = form.password.value;

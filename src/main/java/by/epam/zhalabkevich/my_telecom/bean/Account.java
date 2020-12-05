@@ -2,6 +2,7 @@ package by.epam.zhalabkevich.my_telecom.bean;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -9,15 +10,15 @@ public class Account implements Serializable {
     private final static long serialVersionUID = 2L;
     private long id;
     private BigDecimal balance;
-    private LocalDateTime registrationDate;
-    private Status status;
+    private LocalDate registrationDate;
+    private Status status = Status.BLOCKED;
     private Role role = Role.USER;
 
 
     public Account() {
     }
 
-    public Account(LocalDateTime registrationDate, Status status) {
+    public Account(LocalDate registrationDate, Status status) {
         this.registrationDate = registrationDate;
         this.status = status;
     }
@@ -38,11 +39,11 @@ public class Account implements Serializable {
         this.balance = balance;
     }
 
-    public LocalDateTime getRegistrationDate() {
+    public LocalDate getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(LocalDateTime registrationDate) {
+    public void setRegistrationDate(LocalDate registrationDate) {
         this.registrationDate = registrationDate;
     }
 
@@ -54,7 +55,13 @@ public class Account implements Serializable {
         this.status = status;
     }
 
+    public Role getRole() {
+        return role;
+    }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     @Override
     public boolean equals(Object o) {

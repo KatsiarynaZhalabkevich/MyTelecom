@@ -20,7 +20,7 @@
 <fmt:message bundle="${loc}" key="local.message1index" var="mes1index"/>
 <fmt:message bundle="${loc}" key="local.message2index" var="mes2index"/>
 <fmt:message bundle="${loc}" key="local.buttontarif" var="buttarif"/>
-<script type="module" src="../js/loginValidation.js"></script>
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -30,18 +30,35 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/main" class="navbar-brand">My Telecom</a>
+            <a href="${pageContext.request.contextPath}/main" class="navbar-brand">My Telecom</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <c:if test="${user==null}">
-                    <li><a href="users/new">${registr}</a></li>
+
+                    <li>
+                        <form action="controller" method="get" class="btn-link">
+                            <input type="hidden" name="command" value="go_to_page">
+                            <input type="hidden" name="go_to_page" value="users/new">
+                            <input class="btn-link" type="submit" value="${registr}"/>
+                        </form>
+<%--                        <a href="${pageContext.request.contextPath}/users/new" class="btn-link">${registr}</a>--%>
+                    </li>
                 </c:if>
                 <c:if test="${user!=null}">
-                    <li><a href="users/user">${priv}</a></li>
+                    <li>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="show_user_info">
+                            <input type="submit" value="${priv}" class="btn-link"/>
+                        </form>
+                  </li>
                 </c:if>
-                <c:if test="${isAdmin}">
-                    <li><a href="users/admin">${admin}</a></li>
+                <c:if test="${account.role=='ADMIN'}">
+                    <li >
+                            <form action="users/admin" method="get">
+                                <input  class="btn-link" type="submit" value="${admin}"/>
+                            </form>
+                    </li>
                 </c:if>
             </ul>
             <c:if test="${user!=null}">

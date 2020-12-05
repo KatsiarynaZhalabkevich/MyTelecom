@@ -3,18 +3,18 @@ package by.epam.zhalabkevich.my_telecom.dao.impl;
 import by.epam.zhalabkevich.my_telecom.bean.Account;
 import by.epam.zhalabkevich.my_telecom.bean.Role;
 import by.epam.zhalabkevich.my_telecom.bean.Status;
-import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.dao.AccountDAO;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPoolException;
+import by.epam.zhalabkevich.my_telecom.dao.util.Converter;
 import by.epam.zhalabkevich.my_telecom.dao.util.QueryParameter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,14 +22,13 @@ public class SQLAccountDAO implements AccountDAO {
     private final static Logger logger = LogManager.getLogger();
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
 
-
-    private static final String ADD_ACCOUNT = "INSERT INTO accounts SET user_id = ?;";
-    private static final String UPD_ACCOUNT = "UPDATE accounts SET balance = ?, registration_date = ? WHERE id = ?;";
-    private static final String DEL_ACCOUNT = "DELETE FROM accounts WHERE id = ?;";
-    private static final String GET_ACCOUNT_BY_ID = "SELECT balance, registration_date FROM accounts WHERE id = ?;";
+    private static final String ADD_ACCOUNT = "INSERT INTO accounts SET user_id = ?, registration_date = ?;";
+    private static final String UPD_ACCOUNT = "UPDATE accounts SET balance = ?, registration_date = ? WHERE user_id = ?;";
+    private static final String DEL_ACCOUNT = "DELETE FROM accounts WHERE user_id = ?;";
+    private static final String GET_ACCOUNT_BY_ID = "SELECT id, balance, registration_date, role, status FROM accounts WHERE user_id = ?;";
     private final static String UPD_USER_STATUS_BY_ID = "UPDATE accounts SET status=? WHERE user_id=?";
-    private static final String UPD_BALANCE_BY_USER_ID = "UPDATE accounts SET balance = ? WHERE user_id = ?;" ;
-    private static final String UPD_USER_ROLE_BY_ID = "UPDATE accounts SET role=? WHERE user_id=?" ;
+    private static final String UPD_BALANCE_BY_USER_ID = "UPDATE accounts SET balance = ? WHERE user_id = ?;";
+    private static final String UPD_USER_ROLE_BY_ID = "UPDATE accounts SET role=? WHERE user_id=?";
     private static final String GET_STATUS_BY_USER_ID = "SELECT  status FROM accounts WHERE user_id = ?;";
     private static final String GET_ROLE_BY_USER_ID = "SELECT  role FROM accounts WHERE user_id = ?;";
 
@@ -44,8 +43,10 @@ public class SQLAccountDAO implements AccountDAO {
             setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
             setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
             setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
-           setPreparedStatement(connection, GET_STATUS_BY_USER_ID);
+            setPreparedStatement(connection, GET_STATUS_BY_USER_ID);
             setPreparedStatement(connection, GET_ROLE_BY_USER_ID);
+            setPreparedStatement(connection, GET_ACCOUNT_BY_ID);
+            setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
@@ -64,14 +65,14 @@ public class SQLAccountDAO implements AccountDAO {
             }
         }
     }
-    //объединить в один метод??? add&update
 
-    @Override //id уже есть из user
+    @Override
     public boolean addAccount(long id) throws DAOException {
-        //INSERT INTO accounts SET user_id = ?;
+        //INSERT INTO accounts SET user_id = ?, registration_date = ?;
         try {
             PreparedStatement statement = preparedStatementMap.get(ADD_ACCOUNT);
-            statement.setLong(1,id);
+            statement.setLong(1, id);
+            statement.setDate(2, Date.valueOf(LocalDate.now()));
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             logger.error(e);
@@ -96,9 +97,9 @@ public class SQLAccountDAO implements AccountDAO {
         }
     }
 
-    @Override
-    public int deleteAccountById(long id) throws DAOException {
-        //DELETE FROM accounts WHERE id = ?;
+    @Override //удалять по user_id???
+    public int deleteAccountByUserId(long id) throws DAOException {
+        //DELETE FROM accounts WHERE user_id = ?;
         try {
             PreparedStatement statement = preparedStatementMap.get(DEL_ACCOUNT);
             statement.setLong(1, id);
@@ -112,19 +113,14 @@ public class SQLAccountDAO implements AccountDAO {
 
     @Override
     public Account getAccountByUserId(long id) throws DAOException {
-        //SELECT balance, status, registration_date FROM accounts WHERE id = ?;
+        //SELECT id, balance, status, registration_date FROM accounts WHERE user_id = ?;
         Account account = new Account();
         try {
             PreparedStatement statement = preparedStatementMap.get(GET_ACCOUNT_BY_ID);
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
-                account.setId(id);
-                account.setBalance(resultSet.getBigDecimal(QueryParameter.BALANCE));
-                account.setStatus(Status.valueOf(resultSet.getString(QueryParameter.STATUS)));
-                account.setRegistrationDate(LocalDateTime.parse(
-                        String.valueOf(resultSet.getDate(QueryParameter.REGISTRATION_DATE))
-                ));
+            if (resultSet.next()) {
+              account = Converter.getConverter().convertAccountFromResultSet(resultSet);
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -134,7 +130,7 @@ public class SQLAccountDAO implements AccountDAO {
         return account;
     }
 
-    @Override //баланс сразу исходная сумма
+    @Override
     public boolean updateBalanceByUserId(long id, BigDecimal balance) throws DAOException {
         //UPDATE accounts SET balance = ? WHERE user_id = ?;
         try {
@@ -179,12 +175,12 @@ public class SQLAccountDAO implements AccountDAO {
     @Override
     public Status getStatusByUserId(long id) throws DAOException {
         //SELECT  status FROM accounts WHERE user_id = ?;
-       Status status = null;
+        Status status = null;
         try {
             PreparedStatement statement = preparedStatementMap.get(GET_STATUS_BY_USER_ID);
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 status = Status.valueOf(resultSet.getString(QueryParameter.STATUS));
             }
         } catch (SQLException e) {
@@ -202,7 +198,7 @@ public class SQLAccountDAO implements AccountDAO {
             PreparedStatement statement = preparedStatementMap.get(GET_ROLE_BY_USER_ID);
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 role = Role.valueOf(resultSet.getString(QueryParameter.ROLE));
             }
         } catch (SQLException e) {
@@ -212,7 +208,7 @@ public class SQLAccountDAO implements AccountDAO {
         }
         return role;
     }
-
+//TODO implement method!!!
     @Override
     public BigDecimal getBalanceByUserId(long id) throws DAOException {
         return BigDecimal.valueOf(10000);

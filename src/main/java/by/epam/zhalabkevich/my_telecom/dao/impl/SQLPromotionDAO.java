@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,8 +136,8 @@ public class SQLPromotionDAO implements PromotionDAO {
             while (resultSet.next()) {
                 long id = resultSet.getLong(QueryParameter.ID);
                 String description = resultSet.getString(QueryParameter.DESCRIPTION);
-                LocalDateTime dateStart = LocalDateTime.parse(resultSet.getString(QueryParameter.DATE_START));
-                LocalDateTime dateEnd = LocalDateTime.parse(resultSet.getString(QueryParameter.DATE_END));
+                LocalDate dateStart = LocalDate.parse(resultSet.getString(QueryParameter.DATE_START));
+                LocalDate dateEnd = LocalDate.parse(resultSet.getString(QueryParameter.DATE_END));
                 double discount = resultSet.getDouble(QueryParameter.DISCOUNT);
 
                 promotions.add(new Promotion(id, description, dateStart, dateEnd, discount));

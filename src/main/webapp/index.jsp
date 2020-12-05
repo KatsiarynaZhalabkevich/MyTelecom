@@ -35,23 +35,25 @@
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
 
-    <script type="module" src="js/loginValidation.js"></script>
+<%--    <script type="module" src="${pageContext.request.contextPath}/js/loginValidation.js"></script>--%>
+    <script async type="module" src="${pageContext.request.requestURL}js/loginValidation.js"></script>
 
 
     <title>My Telecom </title>
 </head>
 
 <body>
-<c:import url="/import/header.jsp"/>
+<c:import url="/header"/>
 <br>
 <br>
 <br>
-<div style="color: red" align="right"><c:out value="${sessionScope.loginErrorMessage}"/></div>
-<c:remove var="loginErrorMessage" scope="session"/>
-<div style="color: orangered" align="center"><c:out value="${sessionScope.errorMessage}"/>
-    <c:remove var="errorMessage" scope="session"/></div>
+<div style="color: red" align="right"><c:out value="${requestScope.loginErrorMessage}"/></div>
+<%--<c:remove var="loginErrorMessage" scope="session"/>--%>
+<div style="color: orangered" align="center"><c:out value="${requestScope.errorMessage}"/>
+<%--    <c:remove var="errorMessage" scope="session"/>--%>
+</div>
 <br>
-<%--<div class="container"><h3 align="right"><m:date/></h3></div>--%>
+<div class="container"><h3 align="right"><m:date/></h3></div>
 
 <div class="jumbotron">
 
@@ -69,7 +71,7 @@
 </div>
 
 </div>
-<c:import url="/import/footer.jsp"/>
+<c:import url="/footer"/>
 
 </body>
 </html>

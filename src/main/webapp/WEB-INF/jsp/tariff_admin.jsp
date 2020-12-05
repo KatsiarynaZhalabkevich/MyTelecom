@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" errorPage="/page/error.jsp" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c' %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
@@ -12,10 +12,10 @@
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
 
-    <script type="module" src="../../js/tariffValidation.js"> </script>
+    <script type="module" src="../../js/tariffValidation.js"></script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
-    <fmt:setBundle basename="localization.local" var="loc"/>
+    <fmt:setBundle basename="local" var="loc"/>
 
     <fmt:message bundle="${loc}" key="local.mainpage" var="main"/>
     <fmt:message bundle="${loc}" key="local.registration" var="registr"/>
@@ -38,7 +38,7 @@
     <title>${admin}</title>
 </head>
 <body>
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 <br>
 
 <div class="jumbotron">
@@ -61,27 +61,25 @@
     <table>
         <tr>
             <td>
-                <c:if test="${sessionScope.pageNum>1}">
+                <c:if test="${requestScope.tariffNumPage>1}">
                     <form action="controller" method="get">
-                        <input type="hidden" name="command" value="show_tarifs"/>
-                        <input type="hidden" name="pageNum" value="${sessionScope.pageNum-1}" >
+                        <input type="hidden" name="command" value="show_tariffs"/>
+                        <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage-1}">
                         <input type="submit" class="btn-link" style="color: black" value="${prev}"/>
-                        <c:set scope="session" var="pageNum" value="${sessionScope.pageNum-1}"/>
                     </form>
                 </c:if>
             </td>
             <td>
                 <form action="#">
-                    <input type="submit" class="btn-link" style="color: black" value="${sessionScope.pageNum}">
+                    <input type="submit" class="btn-link" style="color: black" value="${requestScope.tariffNumPage}">
                 </form>
             </td>
             <td>
-                <c:if test="${!sessionScope.isLastPage}">
+                <c:if test="${!requestScope.isLastPageTariff}">
                     <form action="controller" method="get">
-                        <input type="hidden" name="command" value="show_tarifs"/>
-                        <input type="hidden" name="pageNum" value="${sessionScope.pageNum+1}" >
+                        <input type="hidden" name="command" value="show_tariffs"/>
+                        <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage+1}">
                         <input type="submit" class="btn-link" style="color: black" value="${next}"/>
-                        <c:set scope="session" var="pageNum" value="${pageNum+1}"/>
                     </form>
                 </c:if>
             </td>
@@ -102,23 +100,24 @@
         </tr>
 
 
-        <c:forEach var="tarifList" items="${tarifs}">
+        <c:forEach var="tariffList" items="${tariffs}">
             <tr>
-                <form action="controller" method="post" id="edit" onsubmit="return valid(document.getElementById('edit'))">
+                <form action="controller" method="post" id="edit"
+                      onsubmit="return valid(document.getElementById('edit'))">
                     <input type="hidden" name="command" value="edit_tariff">
-                    <td>${tarifList.id}</td>
-                    <td><input type="text"  name="name" value="${tarifList.name}"/></td>
-                    <td><input type="text"  name="description" value="${tarifList.description}"/></td>
-                    <td><input type="text"  name="speed" value=" ${tarifList.speed}"/></td>
-                    <td><input type="text"  name="price" value="${tarifList.price}"/></td>
-                    <td><input type="text"  name="discount" value="${tarifList.discount}"/></td>
-                    <input type="hidden" name="tarif_id" value="${tarifList.id}">
+                    <td>${tariffList.id}</td>
+                    <td><input type="text" name="name" value="${tariffList.name}"/></td>
+                    <td><input type="text" name="description" value="${tariffList.description}"/></td>
+                    <td><input type="text" name="speed" value=" ${tariffList.speed}"/></td>
+                    <td><input type="text" name="price" value="${tariffList.price}"/></td>
+                        <%--                    <td><input type="text"  name="discount" value="${tariffList.discount}"/></td>--%>
+                    <input type="hidden" name="tariff_id" value="${tariffList.id}">
                     <td><input type="submit" class="btn btn-md btn-info" value="${edit}"></td>
                 </form>
                 <td>
                     <form action="controller" method="post">
                         <input type="hidden" name="command" value="delete_tariff">
-                        <input type="hidden" name="tarif_id" value="${tarifList.id}">
+                        <input type="hidden" name="tariff_id" value="${tariffList.id}">
                         <input type="submit" class="btn btn-md btn-danger" value="${delete}">
                     </form>
                 </td>
@@ -128,12 +127,12 @@
             <form action="controller" method="post" id="add" onsubmit="return valid(document.getElementById('add')) ">
                 <input type="hidden" name="command" value="add_tariff">
                 <td></td>
-                <td><input type="text" id="name"  placeholder="${name}" class="form-control" name="name"/></td>
-                <td><input type="text" id="description"  placeholder="${descr}" class="form-control"
+                <td><input type="text" id="name" placeholder="${name}" class="form-control" name="name"/></td>
+                <td><input type="text" id="description" placeholder="${descr}" class="form-control"
                            name="description"/></td>
-                <td><input type="number" id="speed"  placeholder="${speed}" class="form-control" name="speed"/></td>
-                <td><input type="number" id="price"  placeholder="${price}" class="form-control" name="price"/></td>
-                <td><input type="number" id="discount"  placeholder="${discount}" class="form-control" name="discount"/>
+                <td><input type="number" id="speed" placeholder="${speed}" class="form-control" name="speed"/></td>
+                <td><input type="number" id="price" placeholder="${price}" class="form-control" name="price"/></td>
+                <td><input type="number" id="discount" placeholder="${discount}" class="form-control" name="discount"/>
                 </td>
                 <td><input type="submit" class="btn btn-md btn-success" value="${addtariff}"></td>
             </form>
@@ -147,6 +146,6 @@
 </form>
 
 
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

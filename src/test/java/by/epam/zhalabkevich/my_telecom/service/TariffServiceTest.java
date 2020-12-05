@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.service;
 
 import by.epam.zhalabkevich.my_telecom.bean.Tariff;
+import by.epam.zhalabkevich.my_telecom.bean.dto.TariffNote;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
 import by.epam.zhalabkevich.my_telecom.service.util.TestDB;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ import java.util.List;
 public class TariffServiceTest {
     private final static Logger logger = LogManager.getLogger();
     private final TariffService tariffService = ServiceProvider.getInstance().getTariffService();
-    private static Tariff tariff ;
+    private static Tariff tariff;
 
     @BeforeAll
     static void createTariffForTest() {
@@ -28,7 +29,8 @@ public class TariffServiceTest {
         String description = "Tariff for test run";
         tariff = new Tariff(name, price, speed, description);
     }
-//    @BeforeAll
+
+    //    @BeforeAll
 //    static void initDB(){
 //        ConnectionPool connectionPool = ConnectionPool.getInstance();
 //        try (Connection con = connectionPool.takeConnection();
@@ -39,19 +41,28 @@ public class TariffServiceTest {
 //            logger.debug("Failed to recreate test data base.", e);
 //        }
 //    }
-    static void destroyDB(){
+    static void destroyDB() {
 
     }
-@Test
+
+    @Test
     public void showTariffRangeTest() throws ServiceException {
         int limit = 5;
         int page = 0;
         List<Tariff> tariffs = tariffService.showTariffRange(page, limit);
-    for (Tariff t:tariffs) {
-        System.out.println(t);
-    }
-    Assertions.assertEquals(5, tariffs.size());
+        for (Tariff t : tariffs) {
+            System.out.println(t);
+        }
+        Assertions.assertEquals(5, tariffs.size());
 
-}
+    }
+
+    @Test
+    public void getUserTariffsWithAdditionalInfoTest() throws ServiceException {
+        long id = 6;
+        List<TariffNote> notes = tariffService.showUserTariffsByAccountId(id);
+        System.out.println(notes.get(0));
+        Assertions.assertEquals(1, notes.size());
+    }
 
 }

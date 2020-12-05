@@ -14,9 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Objects;
 
-public class UpdateUserPasswordCommand implements Command {
+public class UpdateUserInfoCommand implements Command {
     private final static Logger logger = LogManager.getLogger();
     private final UserService userService = ServiceProvider.getInstance().getUserService();
     private final static String USER = "user";
@@ -29,43 +28,49 @@ public class UpdateUserPasswordCommand implements Command {
     private final static String ERROR_MESSAGE = "errorMessage";
     private final static String UPD_MESSAGE = "updateMessage";
     private final static String ERROR_PASSWORD_MESSAGE = "errorPasswordMessage";
-    private final static String UPD_MESSAGE_TEXT = "User's password updated successfully!";
+    private final static String UPD_MESSAGE_TEXT = "User's info updated successfully!";
     private final static String ERROR_PASSWORD_MESSAGE_TEXT = "Passwords are not equals";
     private final static String ERROR_MESSAGE_TEXT = "Can't update user's information.";
     private final static String ERROR_MESSAGE_TEXT_NOT_USER = "Session is finished. You have no permission for this action. Please, log in!";
 
-    //TODO проверить все внимательно и разбить обновление на 2 формы
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute(USER);
-        String password1 = request.getParameter(PASSWORD + 1);
-        String password2 = request.getParameter(PASSWORD + 2);
         String goToPage;
 
         if (user != null) {
-            if (!password1.isEmpty() && password1.equals(password2)) {
-                try {
-                    if (userService.updatePassword(password1, user)) {
-                        request.setAttribute(UPD_MESSAGE, UPD_MESSAGE_TEXT);
-                        goToPage = "controller?command=show_user_info";
-                    } else {
-                        request.setAttribute(ERROR_MESSAGE, ERROR_MESSAGE_TEXT);
-                        goToPage = JSPPageName.ERROR_PAGE;
-                    }
-                } catch (ServiceException e) {
-                    logger.error(e);
-                    goToPage = JSPPageName.USER_AUTH_PAGE;
-                    request.setAttribute(UPD_MESSAGE, e); //request
+            String name = request.getParameter(NAME);
+            String surname = request.getParameter(SURNAME);
+            String phone = request.getParameter(PHONE);
+            String email = request.getParameter(EMAIL);
+            String address = request.getParameter(ADDRESS);
+
+            User userForUpdate = new User(name, surname, phone, email, address);
+            userForUpdate.setId(user.getId());
+            logger.debug(userForUpdate);
+            try {
+                User userFromDB =userService.saveUpdateUser(userForUpdate);
+                if(!userFromDB.equals(new User())){
+                    //
+                    session.setAttribute(USER, userFromDB);
+                    goToPage = "controller?command=show_user_info";
+                    request.setAttribute(UPD_MESSAGE, UPD_MESSAGE_TEXT);
+                } else {
+                    request.setAttribute(UPD_MESSAGE, ERROR_MESSAGE_TEXT);
+                    goToPage = JSPPageName.USER_EDIT_PROFILE_PAGE;
                 }
-            } else {
-                request.setAttribute(ERROR_PASSWORD_MESSAGE, ERROR_PASSWORD_MESSAGE_TEXT);
-                goToPage = JSPPageName.USER_EDIT_PROFILE_PAGE;
+            } catch (ServiceException e) {
+                logger.error(e);
+                goToPage = JSPPageName.USER_AUTH_PAGE;
+                request.setAttribute(UPD_MESSAGE, e.getMessage()); //request
             }
-        } else {
+        } else{
             request.setAttribute(ERROR_MESSAGE, ERROR_MESSAGE_TEXT_NOT_USER);
             goToPage = JSPPageName.ERROR_PAGE;
         }
+
         request.getRequestDispatcher(goToPage).forward(request, response);
     }
 }

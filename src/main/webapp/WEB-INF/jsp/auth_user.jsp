@@ -1,17 +1,18 @@
 <%@page import="by.epam.zhalabkevich.my_telecom.bean.User" %>
+<%@page import="by.epam.zhalabkevich.my_telecom.bean.Account" %>
+<%@page import="by.epam.zhalabkevich.my_telecom.bean.Tariff" %>
 <%@ page language="java" contentType="text/html; charset=utf-8"
-         pageEncoding="utf-8" errorPage="/page/error.jsp" %>
+         pageEncoding="utf-8" %>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="module" src="../../js/checkBalance.js"></script>
-
-    <script type="module" src="../../js/balanceValidation.js"></script>
+    <script type="module" src="${pageContext.request.contextPath}/js/checkBalance.js"></script>
+    <script type="module" src="${pageContext.request.contextPath}/js/balanceValidation.js"></script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
-    <fmt:setBundle basename="localization.local" var="loc"/>
+    <fmt:setBundle basename="local" var="loc"/>
 
     <fmt:message bundle="${loc}" key="local.mainpage" var="main"/>
     <fmt:message bundle="${loc}" key="local.registration" var="registr"/>
@@ -26,7 +27,9 @@
     <fmt:message bundle="${loc}" key="local.surname" var="surname"/>
     <fmt:message bundle="${loc}" key="local.phone" var="phone"/>
     <fmt:message bundle="${loc}" key="local.email" var="email"/>
-    <fmt:message bundle="${loc}" key="local.accountstat" var="account"/>
+    <fmt:message bundle="${loc}" key="local.address" var="address"/>
+    <fmt:message bundle="${loc}" key="local.registrationDate" var="registrationDate"/>
+    <fmt:message bundle="${loc}" key="local.accountstat" var="accountStat"/>
     <fmt:message bundle="${loc}" key="local.butteditinfo" var="edit"/>
     <fmt:message bundle="${loc}" key="local.balance" var="balance"/>
     <fmt:message bundle="${loc}" key="local.buttupdbalance" var="buttupdbalance"/>
@@ -39,6 +42,8 @@
     <fmt:message bundle="${loc}" key="local.date" var="date"/>
     <fmt:message bundle="${loc}" key="local.buttdeactiv" var="buttdeactiv"/>
     <fmt:message bundle="${loc}" key="local.adminpage" var="admin"/>
+    <fmt:message bundle="${loc}" key="local.promo" var="promo"/>
+    <fmt:message bundle="${loc}" key="local.promoEnd" var="promoEnd"/>
 
 
     <link rel="stylesheet" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -53,19 +58,18 @@
     <title>${priv}</title>
 </head>
 <body>
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 
 
 <div class="jumbotron">
     <div class="container">
-        <h1>${mes1admin}, ${user.name}!</h1>
+        <h1>${mes1admin}, ${user.name} ${user.surname}!</h1>
         <p>${mes2user} </p>
     </div>
 </div>
-<div style="color: red" align="center"><c:out value="${sessionScope.errorMessage}"/></div>
-<c:remove var="errorMessage" scope="session"/>
-<p style="color: blue" align="center">${sessionScope.updateMessage}</p>
-<c:remove var="updateMessage" scope="session"/>
+<div style="color: red" align="center"><c:out value="${requestScope.errorMessage}"/></div>
+<p style="color: blue" align="center">${requestScope.updateMessage}</p>
+
 
 <div class="container">
 
@@ -73,39 +77,40 @@
         <div class="col-md-6">
             <h2>${mes3user}</h2>
             <form>
-                <div class="form-group"><label>${login}: </label>${user.login}</div>
+
                 <div class="form-group"><label> ${name}: </label>
                     ${user.name}</div>
                 <div class="form-group"><label>${surname}: </label>
                     ${user.surname}</div>
                 <div class="form-group"><label>${phone}: </label>
                     ${user.phone}</div>
+                <div class="form-group"><label>${address}: </label>
+                    ${user.address}</div>
                 <div class="form-group"><label> ${email}: </label>
                     ${user.email} </div>
-                <div class="form-group"><label>${account}: </label> ${user.active}</div>
+                <div class="form-group"><label>${accountStat}: </label> ${account.status}</div>
+                <div class="form-group"><label>${registrationDate}: </label> ${account.registrationDate}</div>
             </form>
-            <form action="controller" method="post">
+<%--            TODO создать команду для перехода на страницу редактирования--%>
+            <form action="controller" method="get">
                 <input type="hidden" name="command" value="edit_profile">
                 <input class="btn btn-success" type="submit" value="${edit}"/>
             </form>
         </div>
         <div class="col-md-6">
-
+<%--Все работает--%>
             <form action="controller" method="post" id="bal"
-                  onsubmit="return valid(document.getElementById('bal'))">
-                <p style="color: blue">${sessionScope.updBalanceMessage}</p>
-                <c:remove var="updBalanceMessage" scope="session"/>
+                  onsubmit="valid(document.getElementById('bal'))">
+                <p style="color: blue">${requestScope.updBalanceMessage}</p>
                 <h2> ${balance}:</h2>
                 <input type="hidden" name="command" value="update_balance"/>
-                <p>${user.balance}</p>
+                <p>${account.balance}</p>
                 <input type="text" name="balance"/>
                 <input class="btn btn-success" type="submit" name="send" value="${buttupdbalance}">
 
             </form>
             <br>
-
         </div>
-
     </div>
 </div>
 <div class="container">
@@ -113,30 +118,30 @@
     <div class="row">
         <div class="col-md-6">
             <h2>${mess4user}</h2>
-            <c:if test="${tarifs!=null}">
+            <c:if test="${tariffs!=null}">
                 <div class="table-responsive">
                     <table>
                         <tr>
                             <td>
-                                <c:if test="${sessionScope.pageNum>1}">
+                                <c:if test="${requestScope.tariffNumPage>1}">
                                     <form action="controller" method="get">
-                                        <input type="hidden" name="command" value="tariff_pagination"/>
+                                        <input type="hidden" name="command" value="show_user_info"/>
+                                        <input type="hidden" name="tariffNumPage"
+                                               value="${requestScope.tariffNumPage+1}">
                                         <input type="submit" class="btn-link" style="color: black" value="prev"/>
-                                        <c:set scope="session" var="pageNum" value="${sessionScope.pageNum-1}"/>
-                                        <c:set scope="session" var="goToPage" value="auth_user"/>
                                     </form>
                                 </c:if>
                             </td>
                             <td>
-                                <a href="#" style="color: black"><c:out value="${sessionScope.pageNum}"/> </a>
+                                <a href="#" style="color: black"><c:out value="${requestScope.tariffNumPage}"/> </a>
                             </td>
                             <td>
-                                <c:if test="${!sessionScope.isLastPage}">
+                                <c:if test="${!requestScope.isLastPageTariff}">
                                     <form action="controller" method="get">
-                                        <input type="hidden" name="command" value="tariff_pagination"/>
+                                        <input type="hidden" name="command" value="show_user_info"/>
+                                        <input type="hidden" name="tariffNumPage"
+                                               value="${requestScope.tariffNumPage+1}">
                                         <input type="submit" class="btn-link" style="color: black" value="next"/>
-                                        <c:set scope="session" var="pageNum" value="${pageNum+1}"/>
-                                        <c:set scope="session" var="goToPage" value="auth_user"/>
                                     </form>
                                 </c:if>
                             </td>
@@ -162,42 +167,37 @@
                         </div>
                     </tr>
 
-                    <c:forEach var="tarifList" items="${tarifs}" varStatus="counter">
+                    <c:forEach var="tariffList" items="${tariffs}" varStatus="counter">
                         <tr>
                             <td>${counter.count}</td>
-                            <td> ${tarifList.name}</td>
+                            <td> ${tariffList.name}</td>
 
-                            <td>${tarifList.description}</td>
+                            <td>${tariffList.description}</td>
 
-                            <td>${tarifList.price}</td>
+                            <td>${tariffList.price}</td>
                             <td>
-
                                 <form action="controller" method="post">
                                     <input type="hidden" name="command" value="add_note">
-                                    <input type="hidden" name="tarif_id" value="${tarifList.id}">
-                                    <c:if test="${user.active!='false'}">
+                                    <input type="hidden" name="tariff_id" value="${tariffList.id}">
+                                    <c:if test="${account.status!='BLOCKED'}">
                                         <input type="submit" class="btn btn-info" value="${buttactiv}">
                                     </c:if>
-                                    <c:if test="${user.active=='false'}">
+                                    <c:if test="${account.status=='BLOCKED'}">
                                         <input type="submit" class="btn btn-info disabled" data-toggle="tooltip"
                                                title="Your account is blocked! Check your balance or contact admin"
                                                value="${buttactiv}">
                                     </c:if>
                                 </form>
                             </td>
-
                         </tr>
                     </c:forEach>
-
-
                 </table>
             </c:if>
         </div>
         <div class="col-md-6">
 
             <h2> ${mess5user}:</h2>
-            <c:if test="${userTarifs!=null}">
-
+            <c:if test="${userTariffs!=null}">
                 <table class="table table-responsive table-striped">
                     <tr class="active">
                         <div class="form-group">
@@ -210,12 +210,18 @@
                             <th><label>${price}</label></th>
                         </div>
                         <div class="form-group">
+                            <th><label>${promo}</label></th>
+                        </div>
+                        <div class="form-group">
+                            <th><label>${promoEnd}</label></th>
+                        </div>
+                        <div class="form-group">
                             <th><label>${date}</label></th>
                         </div>
                         <th></th>
                     </tr>
 
-                    <c:forEach var="tariffs" items="${userTarifs}" varStatus="counter">
+                    <c:forEach var="tariffs" items="${userTariffs}" varStatus="counter">
 
                         <tr>
 
@@ -223,19 +229,25 @@
                                 <td>${counter.count} </td>
                             </div>
                             <div class="form-group">
-                                <td>${tariffs.name}</td>
+                                <td>${tariffs.tariff.name}</td>
                             </div>
                             <div class="form-group">
-                                <td>${tariffs.price}</td>
+                                <td>${tariffs.tariff.price}</td>
                             </div>
                             <div class="form-group">
-                                <td>${tariffs.date}</td>
+                                <td>${tariffs.promotion.description}</td>
+                            </div>
+                            <div class="form-group">
+                                <td>${tariffs.promotion.dateEnd}</td>
+                            </div>
+                            <div class="form-group">
+                                <td>${tariffs.note.connectionDate}</td>
                             </div>
 
                             <td>
                                 <form action="controller" method="post">
                                     <input type="hidden" name="command" value="delete_note">
-                                    <input type="hidden" name="note_id" value="${tariffs.noteId}">
+                                    <input type="hidden" name="note_id" value="${tariffs.note.id}">
                                     <input type="submit" class="btn btn-info" value="${buttdeactiv}">
                                 </form>
                             </td>
@@ -256,10 +268,10 @@
     <c:if test="${user.id>0}">
 
         <form action="controller" method="get" id="delete"
-              onsubmit="return checkBalance(document.getElementById('delete'))">
+              onsubmit="checkBalance(document.getElementById('delete'))">
             <input type="hidden" name="command" value="delete_user">
             <input type="hidden" name="user_id" value="${user.id}">
-            <input type="hidden" name="balance" value="${user.balance}">
+            <input type="hidden" name="balance" value="${account.balance}">
             <input type="submit" class="btn-link" value="You can delete your account">
         </form>
     </c:if>
@@ -267,7 +279,7 @@
 </div>
 <br>
 
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 
 
 </body>

@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ page language="java" contentType="text/html; charset=utf-8"
-         pageEncoding="utf-8" errorPage="/page/error.jsp" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         pageEncoding="UTF-8"  errorPage="/page/error.jsp" %>
+<%@page import="by.epam.zhalabkevich.my_telecom.bean.User" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,10 +21,10 @@
             padding: 5%;
         }
     </style>
-    <script type="module" src="../../js/editUserValidation.js">  </script>
+    <script type="module" src="${pageContext.request.contextPath}/js/editUserValidation.js"></script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
-    <fmt:setBundle basename="localization.local" var="loc"/>
+    <fmt:setBundle basename="local" var="loc"/>
     <fmt:message bundle="${loc}" key="local.mainpage" var="main"/>
     <fmt:message bundle="${loc}" key="local.registration" var="registr"/>
     <fmt:message bundle="${loc}" key="local.privpage" var="priv"/>
@@ -36,7 +37,10 @@
     <fmt:message bundle="${loc}" key="local.name" var="name"/>
     <fmt:message bundle="${loc}" key="local.surname" var="surname"/>
     <fmt:message bundle="${loc}" key="local.phone" var="phone"/>
+    <fmt:message bundle="${loc}" key="local.address" var="address"/>
     <fmt:message bundle="${loc}" key="local.email" var="email"/>
+
+    <fmt:message bundle="${loc}" key="local.password" var="password"/>
     <fmt:message bundle="${loc}" key="local.password1" var="password1"/>
     <fmt:message bundle="${loc}" key="local.password2" var="password2"/>
     <fmt:message bundle="${loc}" key="local.message1edit" var="editmess1"/>
@@ -48,7 +52,7 @@
 
 <body>
 
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 <br>
 
 <div class="jumbotron">
@@ -64,38 +68,61 @@
     <div class="row">
         <div class="col-md-6">
             <h2>${userinfo}</h2>
-            <p style="color: red">${sessionScope.updateMessage}</p>
-            <c:remove var="updateMessage" scope="session"/>
-            <p style="color: red">${sessionScope.errorPasswordMessage}</p>
-            <c:remove var="errorPasswordMessage" scope="session"/>
+            <p style="color: red">${requestScope.updateMessage}</p>
+            <%--            <c:remove var="updateMessage" scope="session"/>--%>
+            <p style="color: red">${requestScope.errorPasswordMessage}</p>
+            <%--            <c:remove var="errorPasswordMessage" scope="session"/>--%>
 
 
-            <form action="controller" method="post" id="update"  onsubmit="return valid(document.getElementById('update'))">
-                <input type="hidden" name="command" value="update_user"/>
-                <div class="form-group"><label data-toggle="tooltip" title="You can't change your login"> ${login}: </label>
-                    ${user.getLogin()}<br></div>
+            <form action="controller" method="post" id="update" onsubmit="valid(document.getElementById('update'))">
+                <input type="hidden" name="command" value="update_user_info">
                 <div class="form-group"><label data-toggle="tooltip" title="${name}">  ${name}:</label>
-                    <input type="text" data-toggle="tooltip" title="${surname}" id="name" name="name" value="${user.getName()}"></div>
+                    <input type="text" data-toggle="tooltip" title="${surname}" id="name" name="name"
+                           value="${user.name}"></div>
+                </br>
                 <div class="form-group"><label>  ${surname}:</label>
-                    <input type="text" data-toggle="tooltip" title="${surname}" id="surname" name="surname" value="${user.getSurname()}"></div>
+                    <input type="text" data-toggle="tooltip" title="${surname}" id="surname" name="surname"
+                           value="${user.surname}"></div>
+                </br>
                 <div class="form-group"><label> ${phone}:</label>
-                    <input type="text" data-toggle="tooltip" title="${phone}" id="phone" name="phone" value="${user.getPhone()}"></div>
+                    <input type="text" data-toggle="tooltip" title="${phone}" id="phone" name="phone"
+                           value="${user.phone}"></div>
+                </br>
+                <div class="form-group"><label>    ${address}:</label>
+                    <input type="text" data-toggle="tooltip" title="${address}" id="address" name="address"
+                           value="${user.address}"></div>
+                </br>
                 <div class="form-group"><label>    ${email}:</label>
-                    <input type="text" data-toggle="tooltip" title="${email}" id="email" name="email" value="${user.getEmail()}"></div>
-
+                    <input type="text" data-toggle="tooltip" title="${email}" id="email" name="email"
+                           value="${user.email}"></div>
+                </br>
+                </hr>
+                <div class="form-group form-inline"><input class="btn btn-success" type="submit" value="${update}"/>
+                </div>
+                </br>
+            </form>
+            <form action="controller" method="post" id="update_pass" onsubmit="valid(document.getElementById('update_pass'))">
+                <input type="hidden" name="command" value="update_password">
                 <div class="form-group"><label>   ${password1}:</label>
-                    <input type="password" data-toggle="tooltip" title="${password1}>6" id="password1" name="password1" value=""></div>
+                    <input type="password" data-toggle="tooltip" title="${password1}>6" id="password1" name="password1"
+                           value=""></div>
+                </br>
                 <p style="color: red">${passwordError}</p>
                 <div class="form-group"><label>  ${password2}:</label>
-                    <input type="password" data-toggle="tooltip" title="${password1}>6" id="password2" name="password2" value=""></div>
+                    <input type="password" data-toggle="tooltip" title="${password1}>6" id="password2" name="password2"
+                           value=""></div>
+                </br>
 
-                <div class="form-group form-inline"><input class="btn btn-success" type="submit" value="${update}"/></div>
-                <div class="form-group form-inline" >
-                    <form action="auth_user" method="get">
-                    <input type="hidden" name="command" value="cancel"/>
+                <div class="form-group form-inline"><input class="btn btn-success" type="submit"
+                                                           value="${update} ${password}"/></div>
+                </br>
+            </form>
+            <div class="form-group form-inline">
+                <form action="controller" method="get">
+                    <input type="hidden" name="command" value="show_user_info">
                     <input type="submit" class="btn btn-danger" value="${cancel}"/>
                 </form>
-                </div>
+            </div>
             </form>
 
 
@@ -105,7 +132,7 @@
 </div>
 <br>
 <br>
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>
 

@@ -4,10 +4,7 @@ import by.epam.zhalabkevich.my_telecom.bean.*;
 import by.epam.zhalabkevich.my_telecom.controller.JSPPageName;
 import by.epam.zhalabkevich.my_telecom.controller.command.Command;
 import by.epam.zhalabkevich.my_telecom.controller.util.Pagination;
-import by.epam.zhalabkevich.my_telecom.service.AccountService;
-import by.epam.zhalabkevich.my_telecom.service.ServiceException;
-import by.epam.zhalabkevich.my_telecom.service.ServiceProvider;
-import by.epam.zhalabkevich.my_telecom.service.UserService;
+import by.epam.zhalabkevich.my_telecom.service.*;
 import by.epam.zhalabkevich.my_telecom.service.util.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,11 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-//TODO у авторизованного пользователя могут быть тарифа, Это у зарегистрированного не могут быть!!!
-public class AuthorizationCommand implements Command {
+
+public class ShowUserInfo implements Command {
     private final static Logger logger = LogManager.getLogger();
+    private static final String IS_LAST_TARIFF_PAGE = "isLastPageTariff";
     private final UserService userService = ServiceProvider.getInstance().getUserService();
     private final AccountService accountService = ServiceProvider.getInstance().getAccountService();
+    private final TariffService tariffService = ServiceProvider.getInstance().getTariffService();
     /*перенести все в один класс???*/
     private final static String LOGIN = "login";
     private final static String PASSWORD = "password";
@@ -37,35 +36,30 @@ public class AuthorizationCommand implements Command {
     private final static String ERROR_MESSAGE_TEXT = "Can't get data about tariffs!";
     private final static int LIMIT = 3;
 
-
-    /**
-     * Метод для авторизации пользователя. Включает в себя получение списка тарифов пользователя
-     * и всех тарифов для отображения на странице пользователя
-     *
-     * @param request
-     * @param response
-     * @throws IOException
-     * @throws ServletException
-     */
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String login = request.getParameter(LOGIN);
-        String password = request.getParameter(PASSWORD);
-        String goToPage = JSPPageName.INDEX_PAGE;
-        AuthorizationInfo info = new AuthorizationInfo(login, password);
-        HttpSession session = request.getSession(true);
 
+        String goToPage = JSPPageName.INDEX_PAGE;
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute(USER);
         try {
-            User user = userService.authorize(info);
-            if (user.getId() != 0) {
-                session.setAttribute(USER, user);
+
+            if (user != null) {
                 Account account = accountService.getAccountByUserId(user.getId());
                 request.setAttribute(ACCOUNT, account);
-//                List<Tariff> tariffList = (List<Tariff>) Pagination.makePage(Service.TARIFF, 1, LIMIT);
-//                request.setAttribute(TARIFF_PAGE_NUM, 1);
-//                request.setAttribute(TARIFFS, tariffList);
-                goToPage = Role.ADMIN.equals(account.getRole())
-                        ? JSPPageName.ADMIN_PAGE : "controller?command=show_user_info";
+                int tariffPage;
+                if (request.getParameter(TARIFF_PAGE_NUM) != null) {
+                    logger.debug(request.getParameter(TARIFF_PAGE_NUM));
+                    tariffPage = Integer.parseInt(request.getParameter(TARIFF_PAGE_NUM));
+                } else {
+                    tariffPage = 1;
+                }
+                List<Tariff> tariffList = (List<Tariff>) Pagination.makePage(Service.TARIFF, tariffPage, LIMIT);
+                request.setAttribute(TARIFF_PAGE_NUM, tariffPage);
+                request.setAttribute(IS_LAST_TARIFF_PAGE, tariffList.size() < LIMIT);
+                request.setAttribute(TARIFFS, tariffList);
+                request.setAttribute(USER_TARIFFS, tariffService.showUserTariffsByAccountId(account.getId()));
+                goToPage = JSPPageName.USER_AUTH_PAGE;
             } else {
                 request.setAttribute(LOGIN_ERROR_MESSAGE, LOGIN_ERROR_MESSAGE_TEXT);
                 goToPage = JSPPageName.INDEX_PAGE;
@@ -74,9 +68,7 @@ public class AuthorizationCommand implements Command {
             logger.error(e);
             request.setAttribute(ERROR_MESSAGE, e.getMessage());
         }
-        logger.debug(goToPage);
         request.getRequestDispatcher(goToPage).forward(request, response);
-       // response.sendRedirect();
     }
-
 }
+

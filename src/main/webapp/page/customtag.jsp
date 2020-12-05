@@ -42,7 +42,7 @@
     <title>${tarif}</title>
 </head>
 <body>
-<c:import url="../import/header.jsp"/>
+<c:import url="/header"/>
 
 <br>
 <br>
@@ -93,6 +93,6 @@
         </c:forEach>
     </table>
 </div>
-<c:import url="../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

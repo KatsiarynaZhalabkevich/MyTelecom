@@ -12,7 +12,7 @@ public interface AccountDAO {
 
     int updateAccount(Account account) throws DAOException;
 
-    int deleteAccountById(long id) throws DAOException;
+    int deleteAccountByUserId(long id) throws DAOException;
 
     Account getAccountByUserId(long id) throws DAOException;
 
