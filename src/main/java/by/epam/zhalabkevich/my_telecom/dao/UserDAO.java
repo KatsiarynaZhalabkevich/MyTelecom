@@ -2,11 +2,12 @@ package by.epam.zhalabkevich.my_telecom.dao;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
 import by.epam.zhalabkevich.my_telecom.bean.User;
+import by.epam.zhalabkevich.my_telecom.bean.dto.UserAccount;
 
 import java.util.List;
 
 public interface UserDAO {
-    //TODO число пользователей может быть надо
+    int getUsersNumber() throws DAOException;
 
     User addUser(User user) throws DAOException;
 
@@ -21,6 +22,9 @@ public interface UserDAO {
     User findUserByLoginAndPassword(AuthorizationInfo info) throws DAOException;
 
     List<User> getUsersRange(int page, int limit) throws DAOException;
+
+    List<UserAccount> getUsersWithAccount(int offset, int limit) throws DAOException;
+
 
 //    List<User> findUsersByName(String name) throws DAOException;
 //

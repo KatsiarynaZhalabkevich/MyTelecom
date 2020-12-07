@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class CommandProvider {
     private static final CommandProvider instance = new CommandProvider();
-    private Map<CommandName, Command> commands = new HashMap<>();
+    private final Map<CommandName, Command> commands = new HashMap<>();
 
     public CommandProvider() {
         commands.put(CommandName.AUTHORIZATION, new AuthorizationCommand());
@@ -20,27 +20,26 @@ public class CommandProvider {
         commands.put(CommandName.DELETE_PROMOTION, new DeletePromotionCommand());
         commands.put(CommandName.ADD_PROMOTION_TO_TARIFF, new AddPromotionToTariffCommand());
         commands.put(CommandName.SHOW_PROMOTIONS, new ShowPromotionsCommand());
-        commands.put(CommandName.SHOW_USER_INFO, new ShowUserInfo());
+        commands.put(CommandName.SHOW_USER_INFO, new ShowUserInfoCommand());
         commands.put(CommandName.UPDATE_USER_INFO, new UpdateUserInfoCommand());
-//        commands.put(CommandName.CREATE_USER, new CreateUserCommand());
-//        commands.put(CommandName.UPDATE_USER, new UpdateUserCommand());
         commands.put(CommandName.LOGOUT, new LogOutCommand());
         commands.put(CommandName.SHOW_TARIFFS, new ShowTariffsCommand());
         commands.put(CommandName.UPDATE_BALANCE, new UpdateBalanceCommand());
         commands.put(CommandName.GO_TO_PAGE, new GoToPageCommand());
         commands.put(CommandName.SHOW_USERS, new ShowUsersCommand());
+        commands.put(CommandName.CHANGE_STATUS, new ChangeUserStatusCommand());
+        commands.put(CommandName.DELETE_USER, new DeleteUserCommand());
+        commands.put(CommandName.CHANGE_BALANCE, new ChangeUserBalanceCommand());
+        commands.put(CommandName.SHOW_USER_TARIFF, new ShowUserTariffsCommand());
+        commands.put(CommandName.BLOCK, new BlockUsersWithNegativeBalanceCommand());
+        commands.put(CommandName.PAYMENT, new WithdrawPaymentForMonthCommand());
+        commands.put(CommandName.STATISTIC, new StatisticCommand());
+
 //        commands.put(CommandName.ADD_NOTE, new AddNoteCommand());
 //        commands.put(CommandName.DELETE_NOTE, new DeleteNoteCommand());
-//        commands.put(CommandName.CHANGE_BALANCE, new ChangeBalanceCommand());
-//        commands.put(CommandName.CHANGE_STATUS, new UpdateStatusCommand());
-//        commands.put(CommandName.DELETE_USER, new DeleteUserCommand());
 //        commands.put(CommandName.ADD_TARIFF, new AddTariffCommand());
 //        commands.put(CommandName.EDIT_TARIFF, new EditTariffCommand());
 //        commands.put(CommandName.DELETE_TARIFF, new DeleteTariffCommand());
-//        commands.put(CommandName.SHOW_USER_TARIFF, new ShowUserTariffsCommand());
-//        commands.put(CommandName.PAYMENT, new PaymentCommand());
-//        commands.put(CommandName.BLOCK, new BlockCommand());
-//        commands.put(CommandName.STATISTIC, new StatisticCommand());
 
 
     }

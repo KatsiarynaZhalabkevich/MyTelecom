@@ -21,7 +21,9 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-
+/*
+* Method for user
+* */
 public class UpdateBalanceCommand implements Command {
     private final static Logger logger = LogManager.getLogger();
     private final ServiceProvider provider = ServiceProvider.getInstance();

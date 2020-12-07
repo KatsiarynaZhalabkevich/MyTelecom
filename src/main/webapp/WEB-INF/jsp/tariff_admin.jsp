@@ -49,13 +49,9 @@
     </div>
 </div>
 <div>
-    <p style="color: red" align="left">${sessionScope.errorMessage}</p>
-    <c:remove var="errorMessage" scope="session"/>
-    <p style="color: #4cae4c" align="left">${sessionScope.editMessage}</p>
-    <c:remove var="editMessage" scope="session"/>
-    <p style="color: #4cae4c" align="left">${sessionScope.deleteMessage}</p>
-    <c:remove var="deleteMessage" scope="session"/>
-
+    <p style="color: red" align="left">${requestScope.errorMessage}</p>
+    <p style="color: #4cae4c" align="left">${requestScope.editMessage}</p>
+    <p style="color: #4cae4c" align="left">${requestScope.deleteMessage}</p>
 </div>
 <div class="table-responsive">
     <table>
@@ -141,7 +137,8 @@
 </div>
 
 <form action="admin" method="get">
-    <input type="hidden" name="command" value="cancel"/>
+    <input type="hidden" name="command" value="go_to_page"/>
+    <input type="hidden" name="go_to_page" value="users/admin">
     <input type="submit" class="btn btn-success" value="${back}"/>
 </form>
 

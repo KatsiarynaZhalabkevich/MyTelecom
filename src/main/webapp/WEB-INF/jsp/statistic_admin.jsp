@@ -21,7 +21,7 @@
 
 
     <fmt:setLocale value="${sessionScope.local}"/>
-    <fmt:setBundle basename="localization.local" var="loc"/>
+    <fmt:setBundle basename="local" var="loc"/>
 
     <fmt:message bundle="${loc}" key="local.mainpage" var="main"/>
     <fmt:message bundle="${loc}" key="local.registration" var="registr"/>
@@ -38,7 +38,8 @@
     <fmt:message bundle="${loc}" key="local.ratio" var="ratio"/>
     <fmt:message bundle="${loc}" key="local.conn" var="conn"/>
     <fmt:message bundle="${loc}" key="local.cover" var="cover"/>
-
+    <fmt:message bundle="${loc}" key="local.prevpage" var="prev"/>
+    <fmt:message bundle="${loc}" key="local.nextpage" var="next"/>
     <fmt:message bundle="${loc}" key="local.back" var="back"/>
 
     <title>${statistic}</title>
@@ -46,7 +47,7 @@
 
 <body>
 
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 <br>
 <br>
 <div class="jumbotron">
@@ -65,7 +66,33 @@
         <div class="col-md-6">
             <h2>${amount}</h2>
             <div class="table-responsive">
-
+                <table>
+                    <tr>
+                        <td>
+                            <c:if test="${requestScope.tariffNumPage>1}">
+                                <form action="controller" method="get">
+                                    <input type="hidden" name="command" value="statistic"/>
+                                    <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage-1}">
+                                    <input type="submit" class="btn-link" style="color: black" value="${prev}"/>
+                                </form>
+                            </c:if>
+                        </td>
+                        <td>
+                            <form action="#">
+                                <input type="submit" class="btn-link" style="color: black" value="${requestScope.tariffNumPage}">
+                            </form>
+                        </td>
+                        <td>
+                            <c:if test="${!requestScope.isLastPageTariff}">
+                                <form action="controller" method="get">
+                                    <input type="hidden" name="command" value="statistic"/>
+                                    <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage+1}">
+                                    <input type="submit" class="btn-link" style="color: black" value="${next}"/>
+                                </form>
+                            </c:if>
+                        </td>
+                    </tr>
+                </table>
                 <table class="table table-striped ">
                     <tr class="active">
 
@@ -92,7 +119,7 @@
                         <th>${conn}</th>
                         <th>${cover}, %</th>
                     </tr>
-                    <c:forEach var="tariffs" items="${tarifs}">
+                    <c:forEach var="tariffs" items="${tariffs}">
                         <tr>
 
                             <td>${tariffs.name}</td>
@@ -104,12 +131,13 @@
             </div>
         </div>
     </div>
-    <form action="admin" method="get">
-        <input type="hidden" name="command" value="cancel"/>
+    <form action="controller" method="get">
+        <input type="hidden" name="command" value="go_to_page"/>
+        <input type="hidden" name="go_to_page" value="users/admin"/>
         <input type="submit" class="btn btn-success" value="${back}"/>
     </form>
 </div>
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 
 </html>

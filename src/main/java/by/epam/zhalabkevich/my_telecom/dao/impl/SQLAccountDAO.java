@@ -31,6 +31,8 @@ public class SQLAccountDAO implements AccountDAO {
     private static final String UPD_USER_ROLE_BY_ID = "UPDATE accounts SET role=? WHERE user_id=?";
     private static final String GET_STATUS_BY_USER_ID = "SELECT  status FROM accounts WHERE user_id = ?;";
     private static final String GET_ROLE_BY_USER_ID = "SELECT  role FROM accounts WHERE user_id = ?;";
+    private static final String BLOCK_ACCOUNT_WITH_NEGATIVE_BALANCE = "UPDATE accounts SET status='BLOCKED' WHERE balance < 0";
+    private static final String WITHDRAW_PAYMENT_FOR_MONTH = "UPDATE accounts as a JOIN tariff_notes as n ON a.id = n.account_id JOIN tariffs as t ON t.id = n.tariff_id JOIN promotions as p ON p.id = t.promotion_id SET balance = balance - t.price*p.discount;";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
@@ -40,14 +42,15 @@ public class SQLAccountDAO implements AccountDAO {
             connection = connectionPool.takeConnection();
             setPreparedStatement(connection, ADD_ACCOUNT);
             setPreparedStatement(connection, UPD_ACCOUNT);
-            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
-            setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
-            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
-            setPreparedStatement(connection, GET_STATUS_BY_USER_ID);
-            setPreparedStatement(connection, GET_ROLE_BY_USER_ID);
+            setPreparedStatement(connection, DEL_ACCOUNT);
             setPreparedStatement(connection, GET_ACCOUNT_BY_ID);
             setPreparedStatement(connection, UPD_BALANCE_BY_USER_ID);
-
+            setPreparedStatement(connection, UPD_USER_STATUS_BY_ID);
+            setPreparedStatement(connection, GET_ROLE_BY_USER_ID);
+            setPreparedStatement(connection, GET_STATUS_BY_USER_ID);
+            setPreparedStatement(connection, UPD_USER_ROLE_BY_ID);
+            setPreparedStatement(connection, BLOCK_ACCOUNT_WITH_NEGATIVE_BALANCE);
+            setPreparedStatement(connection, WITHDRAW_PAYMENT_FOR_MONTH);
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
         }
@@ -120,7 +123,7 @@ public class SQLAccountDAO implements AccountDAO {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-              account = Converter.getConverter().convertAccountFromResultSet(resultSet);
+                account = Converter.getConverter().convertAccountFromResultSet(resultSet);
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -208,9 +211,32 @@ public class SQLAccountDAO implements AccountDAO {
         }
         return role;
     }
-//TODO implement method!!!
+
+    //TODO implement method!!!
     @Override
     public BigDecimal getBalanceByUserId(long id) throws DAOException {
         return BigDecimal.valueOf(10000);
+    }
+
+    @Override
+    public int blockAccountsWithNegativeBalance() throws DAOException {
+        try {
+            PreparedStatement statement = preparedStatementMap.get(BLOCK_ACCOUNT_WITH_NEGATIVE_BALANCE);
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException("Impossible to update user's status");
+        }
+    }
+
+    @Override
+    public boolean withdrawPaymentForMonth() throws DAOException {
+        try {
+            PreparedStatement statement = preparedStatementMap.get(WITHDRAW_PAYMENT_FOR_MONTH);
+            return statement.executeUpdate() == 1;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new DAOException("Impossible to withdraw payment");
+        }
     }
 }

@@ -25,7 +25,7 @@ public class GoToPageCommand implements Command {
         String goToPage = request.getParameter(GO_TO_PAGE);
         logger.debug(goToPage);
         logger.debug(page.ifPageExist(goToPage));
-        if(page.ifPageExist(goToPage)){
+        if(!page.ifPageExist(goToPage)){
             goToPage = JSPPageName.INDEX_PAGE;
         }
         logger.debug(goToPage);

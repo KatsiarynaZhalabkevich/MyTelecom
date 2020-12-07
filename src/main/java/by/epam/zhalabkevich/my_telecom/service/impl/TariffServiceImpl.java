@@ -14,8 +14,12 @@ public class TariffServiceImpl implements TariffService {
     private final TariffDAO dao = DAOProvider.getInstance().getTariffDAO();
 
     @Override
-    public long getTariffQuantity() throws ServiceException {
-        return 0;
+    public int getTariffQuantity() throws ServiceException {
+        try {
+            return dao.getTariffsQuantity();
+        } catch (DAOException e) {
+            throw new ServiceException("Impossible to get number of tariffs!");
+        }
     }
 
     @Override
@@ -23,7 +27,7 @@ public class TariffServiceImpl implements TariffService {
         try {
             return dao.getTariffById(id);
         } catch (DAOException e) {
-          throw new ServiceException("Impossible to get information about tariff!");
+            throw new ServiceException("Impossible to get information about tariff!");
         }
     }
 
@@ -41,7 +45,7 @@ public class TariffServiceImpl implements TariffService {
         try {
             return dao.deleteTariffById(id);
         } catch (DAOException e) {
-           throw new ServiceException("Impossible delete tariff");
+            throw new ServiceException("Impossible delete tariff");
         }
     }
 
@@ -68,7 +72,25 @@ public class TariffServiceImpl implements TariffService {
         try {
             return dao.getTariffRange(page, limit);
         } catch (DAOException e) {
-           throw new ServiceException("Impossible to show tariffs");
+            throw new ServiceException("Impossible to show tariffs");
+        }
+    }
+
+    @Override
+    public int getTariffNotesQuantity() throws ServiceException {
+        try {
+            return dao.getTariffNotesQuantity();
+        } catch (DAOException e) {
+            throw new ServiceException("impossible to get number of tariff notes!");
+        }
+    }
+
+    @Override
+    public int getTariffNotesQuantityByTariffId(long id) throws ServiceException {
+        try {
+            return dao.getTariffNotesQuantityByTariffId(id);
+        } catch (DAOException e) {
+            throw new ServiceException("impossible to get number of tariff notes by tariff id!");
         }
     }
 }

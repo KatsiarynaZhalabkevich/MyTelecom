@@ -19,7 +19,8 @@
 <fmt:message bundle="${loc}" key="local.buttonsignin" var="signin"/>
 <fmt:message bundle="${loc}" key="local.message1index" var="mes1index"/>
 <fmt:message bundle="${loc}" key="local.message2index" var="mes2index"/>
-<fmt:message bundle="${loc}" key="local.buttontarif" var="buttarif"/>
+<fmt:message bundle="${loc}" key="local.tarif" var="buttarif"/>
+<fmt:message bundle="${loc}" key="local.users" var="users"/>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -30,7 +31,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="${pageContext.request.contextPath}/main" class="navbar-brand">My Telecom</a>
+            <%--            <a href="${pageContext.request.contextPath}/main" class="navbar-brand">My Telecom</a>--%>
+            <form action="controller" method="get" class="navbar-brand">
+                <input type="hidden" name="command" value="go_to_page">
+                <input type="hidden" name="go_to_page" value="main">
+                <input class="btn-link" type="submit" value="My Telecom"/>
+            </form>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -42,7 +48,7 @@
                             <input type="hidden" name="go_to_page" value="users/new">
                             <input class="btn-link" type="submit" value="${registr}"/>
                         </form>
-<%--                        <a href="${pageContext.request.contextPath}/users/new" class="btn-link">${registr}</a>--%>
+
                     </li>
                 </c:if>
                 <c:if test="${user!=null}">
@@ -51,13 +57,35 @@
                             <input type="hidden" name="command" value="show_user_info">
                             <input type="submit" value="${priv}" class="btn-link"/>
                         </form>
-                  </li>
+                    </li>
+                    <li>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="show_tariffs">
+                            <input type="submit" value="${buttarif}" class="btn-link"/>
+                        </form>
+                    </li>
                 </c:if>
+
                 <c:if test="${account.role=='ADMIN'}">
-                    <li >
-                            <form action="users/admin" method="get">
-                                <input  class="btn-link" type="submit" value="${admin}"/>
-                            </form>
+                    <li>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="go_to_page">
+                            <input type="hidden" name="go_to_page" value="users/admin">
+                            <input class="btn-link" type="submit" value="${admin}"/>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="show_users">
+                            <input class="btn-link" type="submit" value="${users}"/>
+                        </form>
+                    </li>
+<%-- TODO                    еще этого нет--%>
+                    <li>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="statistics">
+                            <input class="btn-link" type="submit" value="${users}"/>
+                        </form>
                     </li>
                 </c:if>
             </ul>

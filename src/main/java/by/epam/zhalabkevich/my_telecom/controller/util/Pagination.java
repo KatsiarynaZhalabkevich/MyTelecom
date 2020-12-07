@@ -38,36 +38,13 @@ public class Pagination {
         } else if (service.equals(Service.USER)) {
             UserService userService = provider.getUserService();
             list = userService.getUsersRange(offset, limit);
+        } else if(service.equals(Service.USER_ACCOUNT)){
+            UserService userService = provider.getUserService();
+            list = userService.getUsersAccounts(offset, limit);
         }
         return list;
     }
 
-    public static List<Tariff> makeTariffPage(HttpServletRequest request) throws ServiceException {
-        TariffService service = provider.getTariffService();
-        List<Tariff> tariffList;
-        HttpSession session = request.getSession();
-
-        int page;
-        if (request.getParameter(PAGE_NUM) != null) {
-            page = Integer.parseInt(request.getParameter(PAGE_NUM));
-        } else {
-            page = 1;
-        }
-        session.setAttribute(PAGE_NUM, page);
-        tariffList = service.showTariffRange(page, LIMIT);
-        if (tariffList != null) {
-            //session.setAttribute(TARIFFS, tariffList);
-            if (tariffList.size() < LIMIT) {
-                session.setAttribute(IS_LAST_PAGE, true);
-            } else {
-                session.setAttribute(IS_LAST_PAGE, false);
-            }
-
-        } else {
-            session.setAttribute(ERROR_MESSAGE, ERROR_MESSAGE_TEXT);
-        }
-        return tariffList;
-    }
 
     //что показывать про User? Может ифа по аккаунту больше интересует?
     public static List<User> makeUserPage(HttpServletRequest request) throws ServiceException {

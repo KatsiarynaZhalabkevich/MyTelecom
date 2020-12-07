@@ -30,12 +30,27 @@
     <fmt:message bundle="${loc}" key="local.description" var="descr"/>
     <fmt:message bundle="${loc}" key="local.price" var="price"/>
     <fmt:message bundle="${loc}" key="local.date" var="date"/>
-
     <fmt:message bundle="${loc}" key="local.back" var="back"/>
+    <fmt:message bundle="${loc}" key="local.registrationDate" var="registrationDate"/>
+    <fmt:message bundle="${loc}" key="local.accountstat" var="accountStat"/>
+    <fmt:message bundle="${loc}" key="local.butteditinfo" var="edit"/>
+    <fmt:message bundle="${loc}" key="local.balance" var="balance"/>
+    <fmt:message bundle="${loc}" key="local.buttupdbalance" var="buttupdbalance"/>
+    <fmt:message bundle="${loc}" key="local.message4user" var="mess4user"/>
+    <fmt:message bundle="${loc}" key="local.nametarif" var="nametarif"/>
+    <fmt:message bundle="${loc}" key="local.description" var="descrip"/>
+    <fmt:message bundle="${loc}" key="local.price" var="price"/>
+    <fmt:message bundle="${loc}" key="local.buttactivate" var="buttactiv"/>
+    <fmt:message bundle="${loc}" key="local.message5user" var="mess5user"/>
+    <fmt:message bundle="${loc}" key="local.date" var="date"/>
+    <fmt:message bundle="${loc}" key="local.buttdeactiv" var="buttdeactiv"/>
+    <fmt:message bundle="${loc}" key="local.adminpage" var="admin"/>
+    <fmt:message bundle="${loc}" key="local.promo" var="promo"/>
+    <fmt:message bundle="${loc}" key="local.promoEnd" var="promoEnd"/>
 
 </head>
 <body>
-<c:import url="../../import/header.jsp"/>
+<c:import url="/header"/>
 <br>
 <div class="jumbotron">
     <div class="container">
@@ -49,36 +64,70 @@
 
     <div class="col-md-8">
 
-        <table class="table table-striped">
-            <tr class="active">
-                <th>${name}</th>
-                <th>${descr}</th>
-                <th>${price}, $</th>
-                <th>${date}</th>
 
+            <table class="table table-responsive table-striped">
 
-            </tr>
-
-            <c:forEach var="tariffs" items="${userTarifList}">
-                <tr>
-                    <td> ${tariffs.name}</td>
-
-                    <td>${tariffs.description}</td>
-
-                    <td>${tariffs.price}</td>
-                    <td>${tariffs.date}</td>
-
+                <tr class="active">
+                    <div class="form-group">
+                        <th><label>№</label></th>
+                    </div>
+                    <div class="form-group">
+                        <th><label>${nametarif}</label></th>
+                    </div>
+                    <div class="form-group">
+                        <th><label>${price}</label></th>
+                    </div>
+                    <div class="form-group">
+                        <th><label>${promo}</label></th>
+                    </div>
+                    <div class="form-group">
+                        <th><label>${promoEnd}</label></th>
+                    </div>
+                    <div class="form-group">
+                        <th><label>${date}</label></th>
+                    </div>
+                    <th></th>
                 </tr>
-            </c:forEach>
+                <c:if test="${userTariffs!=null}">
+                <c:forEach var="tariffs" items="${userTariffs}" varStatus="counter">
 
-        </table>
+                    <tr>
+
+                        <div class="form-group">
+                            <td>${counter.count} </td>
+                        </div>
+                        <div class="form-group">
+                            <td>${tariffs.tariff.name}</td>
+                        </div>
+                        <div class="form-group">
+                            <td>${tariffs.tariff.price}</td>
+                        </div>
+                        <div class="form-group">
+                            <td>${tariffs.promotion.description}</td>
+                        </div>
+                        <div class="form-group">
+                            <td>${tariffs.promotion.dateEnd}</td>
+                        </div>
+                        <div class="form-group">
+                            <td>${tariffs.note.connectionDate}</td>
+                        </div>
+
+                    </tr>
+
+                </c:forEach>
+                </c:if>
+            </table>
+
     </div>
     <br>
-    <form action="users" method="get">
+    <form action="controller" method="get">
+        <input type="hidden" name="command" value="go_to_page">
+        <input type="hidden" name="go_to_page" value="users">
+        <input type="hidden" name="userNumPage" value="${requestScope.userNumPage}">
         <input type="submit" class="btn btn-success" value="${back}"/>
     </form>
 </div>
 
-<c:import url="../../import/footer.jsp"/>
+<c:import url="/footer"/>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package by.epam.zhalabkevich.my_telecom.dao.util;
 
 import by.epam.zhalabkevich.my_telecom.bean.*;
+import by.epam.zhalabkevich.my_telecom.bean.dto.UserAccount;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +41,7 @@ public final class Converter {
         return user;
     }
 
-    public Account convertAccountFromResultSet(ResultSet resultSet)throws SQLException{
+    public Account convertAccountFromResultSet(ResultSet resultSet) throws SQLException {
         Account account = new Account();
         account.setId(resultSet.getLong(QueryParameter.ID));
         account.setBalance(resultSet.getBigDecimal(QueryParameter.BALANCE));
@@ -52,20 +53,26 @@ public final class Converter {
         return account;
     }
 
-    public Promotion convertPromotionFromResultSet(ResultSet resultSet)throws SQLException{
+    public Promotion convertPromotionFromResultSet(ResultSet resultSet) throws SQLException {
         Promotion promotion = new Promotion();
         promotion.setId(resultSet.getLong(QueryParameter.ID));
         promotion.setDescription(resultSet.getString(QueryParameter.DESCRIPTION));
-        promotion.setDateStart(LocalDate.parse(resultSet.getString(QueryParameter.DATE_START),formatter1));
+        promotion.setDateStart(LocalDate.parse(resultSet.getString(QueryParameter.DATE_START), formatter1));
         promotion.setDateEnd(LocalDate.parse(resultSet.getString(QueryParameter.DATE_END), formatter1));
         promotion.setDiscount(resultSet.getDouble(QueryParameter.DISCOUNT));
         return promotion;
     }
 
-    public Note convertNoteFromResultSet(ResultSet resultSet) throws SQLException{
+    public Note convertNoteFromResultSet(ResultSet resultSet) throws SQLException {
         Note note = new Note();
         note.setId(resultSet.getLong(QueryParameter.ID));
         note.setConnectionDate(LocalDate.parse(resultSet.getString(QueryParameter.CONNECTION_DATE), formatter1));
         return note;
+    }
+
+    public UserAccount convertUserAccountFromResultSet(ResultSet resultSet) throws SQLException {
+        User user = convertUserFromResultSet(resultSet);
+        Account account = convertAccountFromResultSet(resultSet);
+        return new UserAccount(user, account);
     }
 }

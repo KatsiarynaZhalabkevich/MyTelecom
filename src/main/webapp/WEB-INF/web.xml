@@ -69,7 +69,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>statistic</servlet-name>
-        <url-pattern>/statistic</url-pattern>
+        <url-pattern>/users/admin/statistic</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>user_tariff</servlet-name>

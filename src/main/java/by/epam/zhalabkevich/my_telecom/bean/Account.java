@@ -3,7 +3,6 @@ package by.epam.zhalabkevich.my_telecom.bean;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Account implements Serializable {

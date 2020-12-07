@@ -20,5 +20,9 @@ public interface AccountService {
 
     boolean updateStatusByUserId(long id, Status status) throws ServiceException;
 
+    int blockUsersWithNegativeBalance() throws ServiceException;
+
+    boolean withdrawPaymentForMonth() throws ServiceException;
+
 
 }

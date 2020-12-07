@@ -2,6 +2,7 @@ package by.epam.zhalabkevich.my_telecom.dao.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
 import by.epam.zhalabkevich.my_telecom.bean.User;
+import by.epam.zhalabkevich.my_telecom.bean.dto.UserAccount;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.UserDAO;
 import by.epam.zhalabkevich.my_telecom.dao.pool.ConnectionPool;
@@ -17,10 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 public class SQLUserDAO implements UserDAO {
-
     private final static Logger logger = LogManager.getLogger();
     private final Converter converter = Converter.getConverter();
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
+
+    private static final String COUNT_USER = "SELECT COUNT(*) FROM users;";
     private final static String FIND_USER_BY_LOGIN = "SELECT users.id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ?;";
     private final static String ADD_USER_AUTH_INFO = "INSERT INTO auth_info (login, password) value (?, ?)";
     private final static String ADD_USER = "INSERT INTO users (name, surname, phone, email, address, id, auth_info_id) value (?, ?,?,?,?,?,?);";
@@ -31,10 +33,9 @@ public class SQLUserDAO implements UserDAO {
     private final static String UPD_PASS_BY_ID = "UPDATE auth_info SET password=? WHERE id=?;";
     private final static String GET_PASS_BY_ID = "SELECT password FROM auth_info WHERE id=?";
     private final static String DELETE_USER_BY_ID = "DELETE  FROM auth_info WHERE id=?;";
-
     private final static String UPD_USER_BALANCE_BY_ID = "UPDATE accounts SET balance=? WHERE id=?";
-
     private static final String GET_USERS_FROM_TO = "SELECT id, name, surname, address, phone, email FROM users LIMIT ? OFFSET ?;";
+    private static final String GET_USERS_ACCOUNT_FROM_TO = "SELECT u.id, a.id, name, surname, address, phone, email, balance, registration_date, status, role FROM users as u JOIN accounts as a ON u.id = a.user_id  LIMIT ? OFFSET ? ;";
     private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = "SELECT auth_info_id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
@@ -56,6 +57,9 @@ public class SQLUserDAO implements UserDAO {
             setPreparedStatement(connection, GET_USERS_FROM_TO);
             setPreparedStatement(connection, FIND_USER_BY_LOGIN_AND_PASSWORD);
             setPreparedStatement(connection, FIND_AUTH_INFO_BY_LOGIN);
+            setPreparedStatement(connection, GET_USERS_ACCOUNT_FROM_TO);
+            setPreparedStatement(connection, COUNT_USER);
+
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
         }
@@ -74,10 +78,22 @@ public class SQLUserDAO implements UserDAO {
     }
 
     @Override
-    public User addUser(User user) throws DAOException {
-
+    public int getUsersNumber() throws DAOException {
+        PreparedStatement statement = preparedStatementMap.get(COUNT_USER);
         try {
-            PreparedStatement statement = preparedStatementMap.get(ADD_USER);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+           logger.error(e);
+           throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public User addUser(User user) throws DAOException {
+        PreparedStatement statement = preparedStatementMap.get(ADD_USER);
+        try {
             statement.setString(1, user.getName());
             statement.setString(2, user.getSurname());
             statement.setString(3, user.getPhone());
@@ -127,8 +143,6 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    //TODO role и статус лежат в таблице аккаунт
-//    или без них обходиться или двойной джойн и возвращать DTO
     @Override
     public User findUserByLogin(String login) throws DAOException {
         //"SELECT id, name, surname, address, phone, email FROM auth_info
@@ -144,7 +158,6 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-    //TODO
     @Override
     public AuthorizationInfo findUserAuthInfoByLogin(String login) throws DAOException {
         //"SELECT auth_info_id, login, password FROM auth_info WHERE login = ?"
@@ -198,10 +211,30 @@ public class SQLUserDAO implements UserDAO {
         return users;
     }
 
-    @Override //возвращает количество таких логинов
+    @Override
+    public List<UserAccount> getUsersWithAccount(int offset, int limit) throws DAOException {
+        //SELECT u.id, name, surname, address, phone, email,
+        //	balance, registration_date, status, role
+        //    FROM users as u JOIN accounts as a ON u.id = a.user_id  LIMIT ? OFFSET ? ;
+        List<UserAccount> users = new ArrayList<>();
+        PreparedStatement statement = preparedStatementMap.get(GET_USERS_ACCOUNT_FROM_TO);
+        try {
+            statement.setInt(1, limit);
+            statement.setInt(2, offset);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                users.add(converter.convertUserAccountFromResultSet(resultSet));
+            }
+        } catch (SQLException e) {
+            logger.error("Impossible get data about users and accounts");
+            throw new DAOException(e);
+        }
+        return users;
+    }
+
+    @Override
     public int isLoginUnique(String login) throws DAOException {
         PreparedStatement statement = preparedStatementMap.get(IS_LOGIN_EXIST);
-
         try {
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();

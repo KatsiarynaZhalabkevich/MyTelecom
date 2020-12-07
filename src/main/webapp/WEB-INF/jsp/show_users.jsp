@@ -1,6 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri='http://java.sun.com/jsp/jstl/core' prefix='c' %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@page import="by.epam.zhalabkevich.my_telecom.bean.dto.UserAccount" %>
 <html>
 <head>
     <link rel="stylesheet" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -25,7 +26,7 @@
             } else if (balance.toString().includes(',')) {
                 fail = "Please, use '.' instead of ','!";
             }
-            if(fail){
+            if (fail) {
                 alert(fail);
                 return false;
             }
@@ -65,7 +66,7 @@
     <fmt:message bundle="${loc}" key="local.prevpage" var="prev"/>
     <fmt:message bundle="${loc}" key="local.nextpage" var="next"/>
     <fmt:message bundle="${loc}" key="local.login" var="login"/>
-<%--    <fmt:message bundle="${loc}" key="local.find" var="find"/>--%>
+    <fmt:message bundle="${loc}" key="local.find" var="find"/>
     <fmt:message bundle="${loc}" key="local.back" var="back"/>
 
     <title>${title}</title>
@@ -76,13 +77,11 @@
 
 <div class="jumbotron">
     <div class="container">
-        <h1>${hello}, ${user.getName()}!</h1>
+        <h1>${hello}, ${user.name}!</h1>
         <p>${mess1} </p>
 
     </div>
 </div>
-
-<!-- сделать красивое размещение кнопок -->
 
 <div class="container">
 
@@ -95,20 +94,13 @@
     </div>
 
     <div>
-        <p style="color: #4cae4c">${sessionScope.paymentMessage}</p>
-        <c:remove var="paymentMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.blockMessage}</p>
-        <c:remove var="blockMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.updBalanceMessage}</p>
-        <c:remove var="updBalanceMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.updStatusMessage}</p>
-        <c:remove var="updStatusMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.deleteUserMessage}</p>
-        <c:remove var="deleteUserMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.errorMessage}</p>
-        <c:remove var="errorMessage" scope="session"/>
-        <p style="color: #4cae4c">${sessionScope.serviceMessage}</p>
-        <c:remove var="serviceMessage" scope="session"/>
+        <p style="color: #4cae4c">${requestScope.paymentMessage}</p>
+        <p style="color: #4cae4c">${requestScope.blockMessage}</p>
+        <p style="color: #4cae4c">${requestScope.updBalanceMessage}</p>
+        <p style="color: #4cae4c">${requestScope.updStatusMessage}</p>
+        <p style="color: #4cae4c">${requestScope.deleteUserMessage}</p>
+        <p style="color: #4cae4c">${requestScope.errorMessage}</p>
+        <p style="color: #4cae4c">${requestScope.serviceMessage}</p>
     </div>
 
     <div class="row">
@@ -126,140 +118,142 @@
         </div>
     </div>
 </div>
-    <div class="container">
-        <table class="table-responsive ">
-            <tr>
-                <td>
+<div>
+    <table class="table-responsive ">
+        <tr>
+            <td>
 
-                    <c:if test="${requestScope.userNumPage>1}">
-                        <form action="controller" method="get">
-                            <input type="hidden" name="command" value="show_users"/>
-                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage-1}">
-                            <input type="submit" class="btn-link" style="color: black" value="${prev}"/>
-                        </form>
-                    </c:if>
-                </td>
-                <td>
-                    <form action="#">
-                        <input type="submit" class="btn-link" style="color: black"
-                               value="${requestScope.userNumPage}">
+                <c:if test="${requestScope.userNumPage>1}">
+                    <form action="controller" method="get">
+                        <input type="hidden" name="command" value="show_users"/>
+                        <input type="hidden" name="userNumPage" value="${requestScope.userNumPage-1}">
+                        <input type="submit" class="btn-link" style="color: black" value="${prev}"/>
                     </form>
-                </td>
-                <td>
-                    <c:if test="${!requestScope.isLastPageUser}">
-                        <form action="controller" method="get">
-                            <input type="hidden" name="command" value="show_users"/>
-                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage+1}">
-                            <input type="submit" class="btn-link" style="color: black" value="${next}"/>
+                </c:if>
+            </td>
+            <td>
+                <form action="#">
+                    <input type="submit" class="btn-link" style="color: black"
+                           value="${requestScope.userNumPage}">
+                </form>
+            </td>
+            <td>
+                <c:if test="${!requestScope.isLastPageUser}">
+                    <form action="controller" method="get">
+                        <input type="hidden" name="command" value="show_users"/>
+                        <input type="hidden" name="userNumPage" value="${requestScope.userNumPage+1}">
+                        <input type="submit" class="btn-link" style="color: black" value="${next}"/>
+                    </form>
+                </c:if>
+            </td>
+        </tr>
+    </table>
+
+
+    <table class="table-responsive table-striped table-bordered ">
+        <tr class="active">
+            <th>№</th>
+            <th>${name}</th>
+            <th>${surname}</th>
+            <th>${phone}</th>
+            <th>${address}</th>
+            <th>${email}</th>
+            <th>${balance}, $</th>
+            <th>${status}</th>
+            <th>${tarif}</th>
+            <th></th>
+            <th></th>
+        </tr>
+
+        <c:if test="${usersAccounts!= null}">
+            <c:forEach var="users" items="${usersAccounts}" varStatus="counter">
+                <tr>
+                    <td> ${users.user.id}</td>
+                    <td>${users.user.name}</td>
+                    <td>${users.user.surname}</td>
+                    <td>${users.user.phone}</td>
+                    <td>${users.user.address}</td>
+                    <td>${users.user.email}</td>
+
+                    <td>
+                        <form action="controller" method="post" id="bal"
+                              onsubmit="valid(document.getElementById('bal'))">
+                                <br/>
+                            <input type="hidden" name="command" value="change_balance">
+                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage}">
+                            <input type="hidden" name="user_id" value="${users.user.id}">
+                            <input type="hidden" name="old_balance" value="${users.account.balance}">
+                            <input type="text" name="balance" value="${users.account.balance}"><br>
+                            <input type="submit" class="btn btn-info btn-md" name="upd"
+                                   value="${updbalance}">
                         </form>
-                    </c:if>
-                </td>
-            </tr>
-        </table>
+                    </td>
+                    <td>
+                        <form action="controller" method="post">
+                            <input type="hidden" name="command" value="change_status">
+                            <input type="hidden" name="user_id" value="${users.user.id}">
+                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage}">
+
+                            <c:choose>
+                                <c:when test="${users.account.status eq 'ACTIVE'}">
+                                    <input type="radio" class="radio-button" name="active" value="ACTIVE"
+                                           checked>${active}
+                                    <br>
+                                    <input type="radio" сlass="radio-button active" name="active"
+                                           value="BLOCKED">${blockstat}
+                                </c:when>
+                                <c:otherwise>
+                                    <input type="radio" class="radio-button" name="active"
+                                           value="ACTIVE">${active}
+                                    <br>
+                                    <input type="radio" сlass="radio-button active" name="active"
+                                           value="BLOCKED"
+                                           checked>${blockstat}
+                                </c:otherwise>
+                            </c:choose>
+                            <input type="submit" class="btn btn-info btn-md" name="" value="${updstatus}">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="controller" method="get">
+                            <input type="hidden" name="command" value="show_user_tariffs">
+                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage}">
+                            <input type="hidden" name="account_id" value="${users.account.id}">
+                            <input type="hidden" name="user_id" value="${users.user.id}">
+                            <input type="submit" class="btn btn-info btn-md" value="${usertariff}">
+                        </form>
+                        <form action="controller" method="post">
+                            <input type="hidden" name="command" value="delete_user">
+                            <input type="hidden" name="userNumPage" value="${requestScope.userNumPage}">
+                            <input type="hidden" name="user_id" value="${users.user.id}">
+                            <input type="submit" class="btn btn-danger btn-md" name=""
+                                   value="${deleteuser}">
+                        </form>
+                    </td>
+
+                    <td>
 
 
-        <table class="table-responsive table-striped table-bordered ">
-            <tr class="active">
-                <th>№</th>
-                <th>${name}</th>
-                <th>${surname}</th>
-                <th>${phone}</th>
-                <th>${address}</th>
-                <th>${email}</th>
-                <th>${balance}, $</th>
-                <th>${status}</th>
-                <th>${tarif}</th>
-                <th></th>
-            </tr>
+                    </td>
 
-            <c:if test="${usersList!= null}">
-                <c:forEach var="users" items="${usersList}" varStatus="counter">
-                    <tr>
-                        <td> ${counter.count}</td>
-                        <td>${users.name}</td>
-                        <td>${users.surname}</td>
-                        <td>${users.phone}</td>
-                        <td>${users.address}</td>
-                        <td>${users.email}</td>
-
-                        <td>
-<%--                            TODO баланс переделать--%>
-<%--                            <form action="controller" method="post" id="bal"--%>
-<%--                                  onsubmit="valid(document.getElementById('bal'))">--%>
-<%--                                    ${users.balance}<br>--%>
-<%--                                <input type="hidden" name="command" value="change_balance">--%>
-<%--                                <input type="hidden" name="user_id" value="${users.id}">--%>
-<%--                                <input type="hidden" name="old_balance" value="${users.balance}">--%>
-<%--                                <input type="text" name="balance" value=""><br>--%>
-<%--                                <input type="submit" class="btn btn-info btn-md" name="upd"--%>
-<%--                                       value="${updbalance}">--%>
-<%--                            </form>--%>
-                        </td>
-                        <td>
-<%--TODO status переделать--%>
-<%--                            <form action="controller" method="post">--%>
-<%--                                <input type="hidden" name="command" value="change_status">--%>
-<%--                                <input type="hidden" name="user_id" value="${users.id}">--%>
-<%--                                <c:choose>--%>
-<%--                                    <c:when test="${users.active=='true'}">--%>
-<%--                                        <input type="radio" class="radio-button" name="active" value="active"--%>
-<%--                                               checked>${active}</input>--%>
-<%--                                        <br>--%>
-<%--                                        <input type="radio" сlass="radio-button active" name="active"--%>
-<%--                                               value="blocked">${blockstat}</input>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:otherwise>--%>
-<%--                                        <input type="radio" class="radio-button" name="active"--%>
-<%--                                               value="active">${active}</input>--%>
-<%--                                        <br>--%>
-<%--                                        <input type="radio" сlass="radio-button active" name="active"--%>
-<%--                                               value="blocked"--%>
-<%--                                               checked>${blockstat}</input>--%>
-<%--                                    </c:otherwise>--%>
-<%--                                </c:choose>--%>
-
-<%--                                <input type="submit" class="btn btn-info btn-md" name="" value="${updstatus}">--%>
-<%--                            </form>--%>
-                        </td>
-<%--TODO что делать с тарифами юзера? куда их показать? --%>
-                        <td>
-<%--                            <form action="controller" method="get">--%>
-<%--                                <input type="hidden" name="command" value="show_user_tarif">--%>
-<%--                                <input type="hidden" name="user_id" value="${users.id}">--%>
-<%--                                <input type="submit" class="btn btn-info btn-md" value="${usertariff}">--%>
-<%--                            </form>--%>
-                        </td>
-
-                        <td>
-<%--                            TODO еще не обработана--%>
-<%--                            <form action="controller" method="post">--%>
-<%--                                <input type="hidden" name="command" value="delete_user">--%>
-<%--                                <input type="hidden" name="user_id" value="${users.id}">--%>
-<%--                                <input type="submit" class="btn btn-danger btn-xs" name=""--%>
-<%--                                       value="${deleteuser}">--%>
-<%--                            </form>--%>
-
-                        </td>
-
-                    </tr>
-                </c:forEach></c:if>
-            <tr>
-<%--TODO find user нет !!!!--%>
-<%--                <form action="controller" method="get">--%>
-<%--                    <td></td>--%>
-<%--                    <input type="hidden" name="command" value="find_user">--%>
-<%--                    <td><input type="text" name="name" placeholder="${name}" value=""></td>--%>
-<%--                    <td><input type="text" name="surname" placeholder="${surname}" value=""></td>--%>
-<%--                    <td><input type="text" name="phone" placeholder="${phone}" value=""></td>--%>
-<%--                    <td><input type="text" name="email" placeholder="email" value=""></td>--%>
-<%--                    <td><input type="text" name="login" placeholder="${login}" value=""></td>--%>
-<%--                    <td><input type="submit" class="btn btn-success" value="${find}"></td>--%>
-<%--                    <td></td>--%>
-<%--                    <td></td>--%>
-<%--                </form>--%>
-            </tr>
-        </table>
-
+                </tr>
+            </c:forEach>
+        </c:if>
+        <tr>
+            <form action="controller" method="get">
+                <td></td>
+                <input type="hidden" name="command" value="find_user">
+                <td><input type="text" name="name" placeholder="${name}" value=""></td>
+                <td><input type="text" name="surname" placeholder="${surname}" value=""></td>
+                <td><input type="text" name="phone" placeholder="${phone}" value=""></td>
+                <td><input type="text" name="email" placeholder="email" value=""></td>
+                <td><input type="text" name="login" placeholder="${login}" value=""></td>
+                <td><input type="submit" class="btn btn-success" value="${find}"></td>
+                <td></td>
+                <td></td>
+            </form>
+        </tr>
+    </table>
 
 
     <br>
@@ -271,9 +265,9 @@
         </form>
     </div>
 </div>
-    <br>
-    <br><br>
+<br>
+<br><br>
 
-    <c:import url="/footer"/>
+<c:import url="/footer"/>
 </body>
 </html>

@@ -27,4 +27,8 @@ public interface AccountDAO {
     Role getRoleByUserId(long id) throws DAOException;
 
     BigDecimal getBalanceByUserId(long id) throws DAOException;
+
+    int blockAccountsWithNegativeBalance() throws DAOException;
+
+    boolean withdrawPaymentForMonth() throws DAOException;
 }

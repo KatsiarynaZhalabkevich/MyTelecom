@@ -6,7 +6,7 @@ import by.epam.zhalabkevich.my_telecom.bean.dto.TariffNote;
 import java.util.List;
 
 public interface TariffService {
-    long getTariffQuantity() throws ServiceException;
+    int getTariffQuantity() throws ServiceException;
 
     Tariff showTariffById(long id) throws ServiceException;
 
@@ -19,5 +19,9 @@ public interface TariffService {
     List<TariffNote> showUserTariffsByAccountId(long id) throws ServiceException;
 
     List<Tariff> showTariffRange(int page, int limit) throws ServiceException;
+
+    int getTariffNotesQuantity() throws ServiceException;
+
+    int getTariffNotesQuantityByTariffId(long id) throws ServiceException;
 
 }

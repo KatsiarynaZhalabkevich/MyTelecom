@@ -2,6 +2,7 @@ package by.epam.zhalabkevich.my_telecom.service.impl;
 
 import by.epam.zhalabkevich.my_telecom.bean.AuthorizationInfo;
 import by.epam.zhalabkevich.my_telecom.bean.User;
+import by.epam.zhalabkevich.my_telecom.bean.dto.UserAccount;
 import by.epam.zhalabkevich.my_telecom.dao.AccountDAO;
 import by.epam.zhalabkevich.my_telecom.dao.DAOException;
 import by.epam.zhalabkevich.my_telecom.dao.DAOProvider;
@@ -21,6 +22,16 @@ public class UserServiceImpl implements UserService {
     private final UserDAO userDAO = provider.getUserDao();
     private final AccountDAO accountDAO = provider.getAccountDAO();
     private final UserDataValidator validator = UserDataValidator.getInstance();
+
+    @Override
+    public int getUsersNumber() throws ServiceException {
+        try {
+            return userDAO.getUsersNumber();
+        } catch (DAOException e) {
+            logger.error(e);
+            throw new ServiceException(e);
+        }
+    }
 
     public User register(AuthorizationInfo info, User user) throws ServiceException {
         if (isLoginUniq(info.getLogin()) == 0) {
@@ -104,6 +115,16 @@ public class UserServiceImpl implements UserService {
         } catch (DAOException e) {
             logger.error(e);
             throw new ServiceException("Impossible to show users");
+        }
+    }
+
+    @Override
+    public List<UserAccount> getUsersAccounts(int page, int limit) throws ServiceException {
+        try {
+            return userDAO.getUsersWithAccount(page, limit);
+        } catch (DAOException e) {
+            logger.error(e);
+            throw new ServiceException("Impossible to show users and accounts");
         }
     }
 

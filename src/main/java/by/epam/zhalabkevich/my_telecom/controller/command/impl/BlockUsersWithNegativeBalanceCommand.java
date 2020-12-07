@@ -1,15 +1,13 @@
 package by.epam.zhalabkevich.my_telecom.controller.command.impl;
 
-import by.epam.zhalabkevich.my_telecom.bean.Promotion;
 import by.epam.zhalabkevich.my_telecom.bean.Role;
 import by.epam.zhalabkevich.my_telecom.bean.User;
 import by.epam.zhalabkevich.my_telecom.controller.JSPPageName;
 import by.epam.zhalabkevich.my_telecom.controller.command.Command;
-import by.epam.zhalabkevich.my_telecom.controller.util.Pagination;
 import by.epam.zhalabkevich.my_telecom.service.AccountService;
-import by.epam.zhalabkevich.my_telecom.service.PromotionService;
 import by.epam.zhalabkevich.my_telecom.service.ServiceException;
 import by.epam.zhalabkevich.my_telecom.service.ServiceProvider;
+import by.epam.zhalabkevich.my_telecom.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,36 +16,36 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
-public class ShowPromotionsCommand implements Command {
+public class BlockUsersWithNegativeBalanceCommand implements Command {
     private final static Logger logger = LogManager.getLogger();
-
     private final ServiceProvider provider = ServiceProvider.getInstance();
-    private final PromotionService promotionService = provider.getPromotionService();
-    private final AccountService accountService = provider.getAccountService();
-    private final static String PROMO_ID = "promoId";
-    private final static String TARIFF_ID = "tariffId";
+    private final  AccountService accountService = provider.getAccountService();
+    private final  UserService userService = provider.getUserService();
     private final static String USER = "user";
     private final static String ERROR_MESSAGE = "errorMessage";
-//переделать на новый лад!!!!
-    //кто угодно может посмотреть  промоакции
+    private final static String BLOCK_MESSAGE = "blockMessage";
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
         HttpSession session = request.getSession();
-        User admin = (User) request.getAttribute(USER);
-        String goToPage;
+        User admin = (User) session.getAttribute(USER);
+        String goToPage = JSPPageName.SHOW_USERS_PAGE;
 
         try {
-            List<Promotion> promotions = Pagination.makePromotionPage(request);
-            request.setAttribute("promotionsList", promotions);
-            if (Role.ADMIN.equals(accountService.checkRoleByUserId(admin.getId()))) {
-                goToPage = JSPPageName.SHOW_PROMO;
+            if (admin != null && Role.ADMIN.equals(accountService.checkRoleByUserId(admin.getId()))) {
+                int numberOfBlockedUsers = accountService.blockUsersWithNegativeBalance();
+                request.setAttribute(BLOCK_MESSAGE, numberOfBlockedUsers + " users were blocked!");
+            }else {
+                request.setAttribute(ERROR_MESSAGE, "You have no permission for this action!");
+                goToPage = JSPPageName.ERROR_PAGE;
             }
+
         } catch (ServiceException e) {
-            e.printStackTrace();
+            logger.error(e);
+            request.setAttribute(ERROR_MESSAGE, e.getMessage());
         }
-
-
+        response.sendRedirect(goToPage);
     }
 }

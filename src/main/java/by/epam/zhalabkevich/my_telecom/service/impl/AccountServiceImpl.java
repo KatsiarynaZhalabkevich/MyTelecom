@@ -80,4 +80,24 @@ public class AccountServiceImpl implements AccountService {
             throw new ServiceException("Impossible to update status!");
         }
     }
+
+    @Override
+    public int blockUsersWithNegativeBalance() throws ServiceException {
+        try {
+            return  accountDAO.blockAccountsWithNegativeBalance();
+        } catch (DAOException e) {
+            logger.error(e);
+            throw new ServiceException("Impossible to block users with negative balance!");
+        }
+    }
+
+    @Override
+    public boolean withdrawPaymentForMonth() throws ServiceException {
+        try {
+            return accountDAO.withdrawPaymentForMonth();
+        } catch (DAOException e) {
+            logger.error(e);
+            throw new ServiceException("Impossible to withdraw payment for month");
+        }
+    }
 }

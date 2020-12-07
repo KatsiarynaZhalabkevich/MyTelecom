@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-public class ShowUserInfo implements Command {
+public class ShowUserInfoCommand implements Command {
     private final static Logger logger = LogManager.getLogger();
     private static final String IS_LAST_TARIFF_PAGE = "isLastPageTariff";
     private final UserService userService = ServiceProvider.getInstance().getUserService();
