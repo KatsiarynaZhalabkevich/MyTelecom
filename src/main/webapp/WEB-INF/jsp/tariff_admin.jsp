@@ -49,9 +49,10 @@
     </div>
 </div>
 <div>
-    <p style="color: red" align="left">${requestScope.errorMessage}</p>
-    <p style="color: #4cae4c" align="left">${requestScope.editMessage}</p>
-    <p style="color: #4cae4c" align="left">${requestScope.deleteMessage}</p>
+    <p style="color: red" >${requestScope.errorMessage}</p>
+    <p style="color: #4cae4c" >${requestScope.editMessage}</p>
+    <p style="color: #4cae4c" >${requestScope.addMessage}</p>
+    <p style="color: #4cae4c" >${requestScope.deleteMessage}</p>
 </div>
 <div class="table-responsive">
     <table>
@@ -101,18 +102,21 @@
                 <form action="controller" method="post" id="edit"
                       onsubmit="return valid(document.getElementById('edit'))">
                     <input type="hidden" name="command" value="edit_tariff">
+                    <input type="hidden" name="tariff_id" value="${tariffList.id}">
+                    <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage}">
+                    <input type="hidden" name="name" value="${tariffList.name}">
                     <td>${tariffList.id}</td>
-                    <td><input type="text" name="name" value="${tariffList.name}"/></td>
+                    <td>${tariffList.name}</td>
                     <td><input type="text" name="description" value="${tariffList.description}"/></td>
                     <td><input type="text" name="speed" value=" ${tariffList.speed}"/></td>
                     <td><input type="text" name="price" value="${tariffList.price}"/></td>
                         <%--                    <td><input type="text"  name="discount" value="${tariffList.discount}"/></td>--%>
-                    <input type="hidden" name="tariff_id" value="${tariffList.id}">
                     <td><input type="submit" class="btn btn-md btn-info" value="${edit}"></td>
                 </form>
                 <td>
                     <form action="controller" method="post">
                         <input type="hidden" name="command" value="delete_tariff">
+                        <input type="hidden" name="tariffNumPage" value="${requestScope.tariffNumPage}">
                         <input type="hidden" name="tariff_id" value="${tariffList.id}">
                         <input type="submit" class="btn btn-md btn-danger" value="${delete}">
                     </form>
@@ -120,7 +124,7 @@
             </tr>
         </c:forEach>
         <tr>
-            <form action="controller" method="post" id="add" onsubmit="return valid(document.getElementById('add')) ">
+            <form action="controller" method="post" id="add" onsubmit="valid(document.getElementById('add')) ">
                 <input type="hidden" name="command" value="add_tariff">
                 <td></td>
                 <td><input type="text" id="name" placeholder="${name}" class="form-control" name="name"/></td>
@@ -128,7 +132,8 @@
                            name="description"/></td>
                 <td><input type="number" id="speed" placeholder="${speed}" class="form-control" name="speed"/></td>
                 <td><input type="number" id="price" placeholder="${price}" class="form-control" name="price"/></td>
-                <td><input type="number" id="discount" placeholder="${discount}" class="form-control" name="discount"/>
+<%--                Add promotion --%>
+<%--                <td><input type="number" id="discount" placeholder="${discount}" class="form-control" name="discount"/>--%>
                 </td>
                 <td><input type="submit" class="btn btn-md btn-success" value="${addtariff}"></td>
             </form>
@@ -136,7 +141,7 @@
     </table>
 </div>
 
-<form action="admin" method="get">
+<form action="controller" method="get">
     <input type="hidden" name="command" value="go_to_page"/>
     <input type="hidden" name="go_to_page" value="users/admin">
     <input type="submit" class="btn btn-success" value="${back}"/>

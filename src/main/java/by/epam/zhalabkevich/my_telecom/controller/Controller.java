@@ -50,7 +50,7 @@ public class Controller extends HttpServlet {
         }
 
         commandName = request.getParameter(COMMAND);
-        System.out.println("command name"+commandName);
+        System.out.println("command name "+commandName);
         command = provider.getCommand(commandName);
         logger.info(commandName);
         command.execute(request, response);

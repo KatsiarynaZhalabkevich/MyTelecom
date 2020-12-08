@@ -34,12 +34,11 @@ public class CommandProvider {
         commands.put(CommandName.BLOCK, new BlockUsersWithNegativeBalanceCommand());
         commands.put(CommandName.PAYMENT, new WithdrawPaymentForMonthCommand());
         commands.put(CommandName.STATISTIC, new StatisticCommand());
-
-//        commands.put(CommandName.ADD_NOTE, new AddNoteCommand());
-//        commands.put(CommandName.DELETE_NOTE, new DeleteNoteCommand());
-//        commands.put(CommandName.ADD_TARIFF, new AddTariffCommand());
-//        commands.put(CommandName.EDIT_TARIFF, new EditTariffCommand());
-//        commands.put(CommandName.DELETE_TARIFF, new DeleteTariffCommand());
+        commands.put(CommandName.ADD_NOTE, new AddTariffNoteToAccountCommand());
+        commands.put(CommandName.DELETE_NOTE, new DeleteTariffNoteFromAccountCommand());
+        commands.put(CommandName.ADD_TARIFF, new AddNewTariffCommand());
+        commands.put(CommandName.EDIT_TARIFF, new EditTariffCommand());
+        commands.put(CommandName.DELETE_TARIFF, new DeleteTariffCommand());
 
 
     }

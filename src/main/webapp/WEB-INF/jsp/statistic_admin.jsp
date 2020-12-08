@@ -66,6 +66,26 @@
         <div class="col-md-6">
             <h2>${amount}</h2>
             <div class="table-responsive">
+
+                <table class="table table-striped ">
+                    <tr class="active">
+
+                        <th>${users}</th>
+                        <th>${tarif}</th>
+                        <th>${connections}</th>
+                    </tr>
+                    <tr>
+                        <td>${user_number}</td>
+                        <td>${tariff_number}</td>
+                        <td>${connectionsCount}</td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>${ratio}</h2>
+            <div class="table-responsive">
                 <table>
                     <tr>
                         <td>
@@ -93,25 +113,6 @@
                         </td>
                     </tr>
                 </table>
-                <table class="table table-striped ">
-                    <tr class="active">
-
-                        <th>${users}</th>
-                        <th>${tarif}</th>
-                        <th>${connections}</th>
-                    </tr>
-                    <tr>
-                        <td>${user_number}</td>
-                        <td>${tariff_number}</td>
-                        <td>${connectionsCount}</td>
-                    </tr>
-
-                </table>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <h2>${ratio}</h2>
-            <div class="table-responsive">
                 <table class="table table-striped ">
                     <tr class="active">
 

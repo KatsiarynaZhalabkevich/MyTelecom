@@ -14,6 +14,8 @@ public interface TariffDAO {
 
     boolean deleteTariffById(long id) throws DAOException;
 
+    int getNumberTariffsWithName(String name)throws DAOException;
+
     //сделать dto тоже пагинация нужна? хотя в теории может быть 2-3 таких тарифа, максимум 5
     List<Tariff> getTariffsByAccountId(long id) throws DAOException;
 

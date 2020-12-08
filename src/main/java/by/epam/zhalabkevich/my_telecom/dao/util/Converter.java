@@ -55,7 +55,7 @@ public final class Converter {
 
     public Promotion convertPromotionFromResultSet(ResultSet resultSet) throws SQLException {
         Promotion promotion = new Promotion();
-        promotion.setId(resultSet.getLong(QueryParameter.ID));
+        promotion.setId(resultSet.getLong(QueryParameter.PROMOTION_ID));
         promotion.setDescription(resultSet.getString(QueryParameter.DESCRIPTION));
         promotion.setDateStart(LocalDate.parse(resultSet.getString(QueryParameter.DATE_START), formatter1));
         promotion.setDateEnd(LocalDate.parse(resultSet.getString(QueryParameter.DATE_END), formatter1));
@@ -65,7 +65,7 @@ public final class Converter {
 
     public Note convertNoteFromResultSet(ResultSet resultSet) throws SQLException {
         Note note = new Note();
-        note.setId(resultSet.getLong(QueryParameter.ID));
+        note.setId(resultSet.getLong(QueryParameter.NOTE_ID));
         note.setConnectionDate(LocalDate.parse(resultSet.getString(QueryParameter.CONNECTION_DATE), formatter1));
         return note;
     }

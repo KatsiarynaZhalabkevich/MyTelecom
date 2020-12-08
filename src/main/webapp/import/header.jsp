@@ -21,6 +21,7 @@
 <fmt:message bundle="${loc}" key="local.message2index" var="mes2index"/>
 <fmt:message bundle="${loc}" key="local.tarif" var="buttarif"/>
 <fmt:message bundle="${loc}" key="local.users" var="users"/>
+<fmt:message bundle="${loc}" key="local.statistic" var="statistic"/>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -42,7 +43,7 @@
             <ul class="nav navbar-nav">
                 <c:if test="${user==null}">
 
-                    <li>
+                    <li><br>
                         <form action="controller" method="get" class="btn-link">
                             <input type="hidden" name="command" value="go_to_page">
                             <input type="hidden" name="go_to_page" value="users/new">
@@ -52,13 +53,13 @@
                     </li>
                 </c:if>
                 <c:if test="${user!=null}">
-                    <li>
+                    <li><br>
                         <form action="controller" method="get">
                             <input type="hidden" name="command" value="show_user_info">
                             <input type="submit" value="${priv}" class="btn-link"/>
                         </form>
                     </li>
-                    <li>
+                    <li><br>
                         <form action="controller" method="get">
                             <input type="hidden" name="command" value="show_tariffs">
                             <input type="submit" value="${buttarif}" class="btn-link"/>
@@ -66,25 +67,25 @@
                     </li>
                 </c:if>
 
-                <c:if test="${account.role=='ADMIN'}">
-                    <li>
+                <c:if test="${user.id == 1}">
+                    <li><br>
                         <form action="controller" method="get">
                             <input type="hidden" name="command" value="go_to_page">
                             <input type="hidden" name="go_to_page" value="users/admin">
                             <input class="btn-link" type="submit" value="${admin}"/>
                         </form>
                     </li>
-                    <li>
+                    <li><br>
                         <form action="controller" method="get">
                             <input type="hidden" name="command" value="show_users">
                             <input class="btn-link" type="submit" value="${users}"/>
                         </form>
                     </li>
-<%-- TODO                    еще этого нет--%>
-                    <li>
+
+                    <li><br>
                         <form action="controller" method="get">
-                            <input type="hidden" name="command" value="statistics">
-                            <input class="btn-link" type="submit" value="${users}"/>
+                            <input type="hidden" name="command" value="statistic">
+                            <input class="btn-link" type="submit" value="${statistic}"/>
                         </form>
                     </li>
                 </c:if>
@@ -119,13 +120,11 @@
                 <div>
                     <form action="controller" method="post">
                         <input type="hidden" name="local" value="ru"/>
-                        <input type="submit" class="btn btn-xs btn-default " value="${ru_button}"/>
+                        <input type="submit" class="btn btn-xs btn-info" value="${ru_button}"/>
                     </form>
-                </div>
-                <div>
                     <form action="controller" method="post">
                         <input type="hidden" name="local" value="en"/>
-                        <input type="submit" class="btn-default btn btn-xs" value="${en_button}"/>
+                        <input type="submit" class="btn-info btn btn-xs" value="${en_button}"/>
                     </form>
                 </div>
             </div>

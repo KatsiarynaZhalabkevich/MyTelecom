@@ -1,9 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.dao;
 
-import by.epam.zhalabkevich.my_telecom.dao.impl.SQLAccountDAO;
-import by.epam.zhalabkevich.my_telecom.dao.impl.SQLPromotionDAO;
-import by.epam.zhalabkevich.my_telecom.dao.impl.SQLTariffDAO;
-import by.epam.zhalabkevich.my_telecom.dao.impl.SQLUserDAO;
+import by.epam.zhalabkevich.my_telecom.dao.impl.*;
 
 public class DAOProvider {
     private static final DAOProvider instance = new DAOProvider();
@@ -11,7 +8,7 @@ public class DAOProvider {
     private final TariffDAO tariffDAO = new SQLTariffDAO();
     private final AccountDAO accountDAO = new SQLAccountDAO();
     private final PromotionDAO promotionDAO = new SQLPromotionDAO();
-   // private final NoteDAO noteDAO = new SQLNoteDAO();
+    private final NoteDAO noteDAO = new SQLNoteDAO();
 
     private DAOProvider() {
     }
@@ -24,10 +21,20 @@ public class DAOProvider {
         return userDao;
     }
 
-    public TariffDAO getTariffDAO() {return tariffDAO;}
-    public PromotionDAO getPromotionDAO(){return promotionDAO;}
-    public AccountDAO getAccountDAO() {return accountDAO;}
+    public TariffDAO getTariffDAO() {
+        return tariffDAO;
+    }
 
-    //public NoteDAO getNoteDAO(){return noteDAO;}
+    public PromotionDAO getPromotionDAO() {
+        return promotionDAO;
+    }
+
+    public AccountDAO getAccountDAO() {
+        return accountDAO;
+    }
+
+    public NoteDAO getNoteDAO() {
+        return noteDAO;
+    }
 
 }

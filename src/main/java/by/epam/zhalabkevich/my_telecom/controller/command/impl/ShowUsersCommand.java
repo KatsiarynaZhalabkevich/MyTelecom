@@ -52,7 +52,7 @@ public class ShowUsersCommand implements Command {
 
             request.setAttribute(USERS_ACCOUNTS, userAccountList);
             if (Role.ADMIN.equals(accountService.checkRoleByUserId(admin.getId()))) {
-                goToPage = JSPPageName.SHOW_USERS_PAGE;
+                goToPage = JSPPageName.SHOW_USERS_PAGE; //из-за этой строчки перекидывает не туда
             } else {
                 goToPage = JSPPageName.ERROR_PAGE;
                 request.setAttribute(ERROR_MESSAGE, "You have no permission for this action!");

@@ -27,12 +27,14 @@ public final class QueryParameter {
 
     /* note*/
     public final static String CONNECTION_DATE = "connection_date";
+    public final static String NOTE_ID = "noteId";
 
     /*tariff*/
     public final static String PRICE = "price";
     public final static String SPEED = "speed";
 
     /*promotion*/
+    public final static String PROMOTION_ID ="promotionId";
     public final static String DATE_START = "date_start";
     public final static String DATE_END = "date_end";
     public final static String DISCOUNT = "discount";

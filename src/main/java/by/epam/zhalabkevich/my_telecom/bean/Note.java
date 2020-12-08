@@ -2,9 +2,8 @@ package by.epam.zhalabkevich.my_telecom.bean;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Objects;
-
+//слишком мало полей и не информативно получается. А добавлять id или сущность?
 public class Note implements Serializable {
     private final static long serialVersionUID = 3L;
     private long id;

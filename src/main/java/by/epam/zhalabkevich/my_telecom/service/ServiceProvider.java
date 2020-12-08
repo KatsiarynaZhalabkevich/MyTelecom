@@ -1,9 +1,6 @@
 package by.epam.zhalabkevich.my_telecom.service;
 
-import by.epam.zhalabkevich.my_telecom.service.impl.AccountServiceImpl;
-import by.epam.zhalabkevich.my_telecom.service.impl.PromotionServiceImpl;
-import by.epam.zhalabkevich.my_telecom.service.impl.TariffServiceImpl;
-import by.epam.zhalabkevich.my_telecom.service.impl.UserServiceImpl;
+import by.epam.zhalabkevich.my_telecom.service.impl.*;
 
 public class ServiceProvider {
     private static final ServiceProvider instance = new ServiceProvider();
@@ -15,7 +12,7 @@ public class ServiceProvider {
     private final TariffService tariffService = new TariffServiceImpl();
     private final AccountService accountService = new AccountServiceImpl();
     private final PromotionService promotionService = new PromotionServiceImpl();
-//    private NoteService noteService = new NoteServiceImpl();
+    private NoteService noteService = new NoteServiceImpl();
 
 
     public static ServiceProvider getInstance() {
@@ -30,11 +27,16 @@ public class ServiceProvider {
         return tariffService;
     }
 
-    public AccountService getAccountService(){
+    public AccountService getAccountService() {
         return accountService;
     }
 
-    public PromotionService getPromotionService(){return promotionService;}
-//    public NoteService getNoteService(){return noteService;}
+    public PromotionService getPromotionService() {
+        return promotionService;
+    }
+
+    public NoteService getNoteService() {
+        return noteService;
+    }
 
 }

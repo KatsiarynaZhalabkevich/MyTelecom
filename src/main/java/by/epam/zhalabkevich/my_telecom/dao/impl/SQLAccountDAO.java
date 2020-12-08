@@ -32,7 +32,7 @@ public class SQLAccountDAO implements AccountDAO {
     private static final String GET_STATUS_BY_USER_ID = "SELECT  status FROM accounts WHERE user_id = ?;";
     private static final String GET_ROLE_BY_USER_ID = "SELECT  role FROM accounts WHERE user_id = ?;";
     private static final String BLOCK_ACCOUNT_WITH_NEGATIVE_BALANCE = "UPDATE accounts SET status='BLOCKED' WHERE balance < 0";
-    private static final String WITHDRAW_PAYMENT_FOR_MONTH = "UPDATE accounts as a JOIN tariff_notes as n ON a.id = n.account_id JOIN tariffs as t ON t.id = n.tariff_id JOIN promotions as p ON p.id = t.promotion_id SET balance = balance - t.price*p.discount;";
+    private static final String WITHDRAW_PAYMENT_FOR_MONTH = "UPDATE accounts as a JOIN tariff_notes as n ON a.id = n.account_id JOIN tariffs as t ON t.id = n.tariff_id JOIN promotions as p ON p.id = t.promotion_id SET balance = balance - t.price*(1-p.discount);";
 
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 

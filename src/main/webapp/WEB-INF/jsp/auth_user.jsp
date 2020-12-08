@@ -91,14 +91,14 @@
                 <div class="form-group"><label>${accountStat}: </label> ${account.status}</div>
                 <div class="form-group"><label>${registrationDate}: </label> ${account.registrationDate}</div>
             </form>
-<%--            TODO создать команду для перехода на страницу редактирования--%>
+
             <form action="controller" method="get">
                 <input type="hidden" name="command" value="edit_profile">
                 <input class="btn btn-success" type="submit" value="${edit}"/>
             </form>
         </div>
         <div class="col-md-6">
-<%--Все работает--%>
+
             <form action="controller" method="post" id="bal"
                   onsubmit="valid(document.getElementById('bal'))">
                 <p style="color: blue">${requestScope.updBalanceMessage}</p>
@@ -179,6 +179,9 @@
                                 <form action="controller" method="post">
                                     <input type="hidden" name="command" value="add_note">
                                     <input type="hidden" name="tariff_id" value="${tariffList.id}">
+                                    <input type="hidden" name="tariffNumPage"
+                                           value="${requestScope.tariffNumPage}">
+                                    <input type="hidden" name="account_id" value="${account.id}">
                                     <c:if test="${account.status!='BLOCKED'}">
                                         <input type="submit" class="btn btn-info" value="${buttactiv}">
                                     </c:if>
@@ -265,16 +268,16 @@
     </div>
 
     <br><br>
-    <c:if test="${user.id>0}">
+<%--    <c:if test="${user.id>0}">--%>
 
-        <form action="controller" method="get" id="delete"
-              onsubmit="checkBalance(document.getElementById('delete'))">
-            <input type="hidden" name="command" value="delete_user">
-            <input type="hidden" name="user_id" value="${user.id}">
-            <input type="hidden" name="balance" value="${account.balance}">
-            <input type="submit" class="btn-link" value="You can delete your account">
-        </form>
-    </c:if>
+<%--        <form action="controller" method="get" id="delete"--%>
+<%--              onsubmit="checkBalance(document.getElementById('delete'))">--%>
+<%--            <input type="hidden" name="command" value="delete_user">--%>
+<%--            <input type="hidden" name="user_id" value="${user.id}">--%>
+<%--            <input type="hidden" name="balance" value="${account.balance}">--%>
+<%--            <input type="submit" class="btn-link" value="You can delete your account">--%>
+<%--        </form>--%>
+<%--    </c:if>--%>
 
 </div>
 <br>

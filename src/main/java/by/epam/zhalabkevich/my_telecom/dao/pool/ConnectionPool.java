@@ -124,7 +124,6 @@ public final class ConnectionPool {
 
     public void closeConnection(Connection connection, Statement statement) {
         try {
-
             statement.close();
             connection.close();
         } catch (SQLException e) {

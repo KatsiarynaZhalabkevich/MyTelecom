@@ -34,23 +34,19 @@
 <div class="jumbotron">
     <div class="container">
         <c:if test="${user!=null}">
-            <h2>${hello}, ${user.getName()}!</h2>
+            <h2>${hello}, ${user.name} ${user.surname}!</h2>
         </c:if>
         <p>${mess2}</p>
-        <p style="color: red"><c:out value="${sessionScope.errorMessage}"/></p>
-        <c:remove var="errorMessage" scope="session"/>
+        <p style="color: red"><c:out value="${requestScope.errorMessage}"/></p>
     </div>
 
     </form>
-    <form action="main" method="get">
-        <input type="hidden" name="command" value="cancel"/>
+    <form action="controller" method="get">
+        <input type="hidden" name="command" value="go_to_page"/>
+        <input type="hidden" name="go_to_page" value="main"/>
         <input type="submit" class="btn btn-success" value="${gotomain} &raquo;" />
     </form>
 </div>
-
-
-
-
 
 <c:import url="/footer"/>
 </body>

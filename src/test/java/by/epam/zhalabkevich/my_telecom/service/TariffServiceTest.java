@@ -59,10 +59,10 @@ public class TariffServiceTest {
 
     @Test
     public void getUserTariffsWithAdditionalInfoTest() throws ServiceException {
-        long id = 6;
+        long id = 14;
         List<TariffNote> notes = tariffService.showUserTariffsByAccountId(id);
         System.out.println(notes.get(0));
-        Assertions.assertEquals(1, notes.size());
+        Assertions.assertEquals(3, notes.size());
     }
 
 }

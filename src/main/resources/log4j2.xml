@@ -19,7 +19,7 @@
             </Policies>
         </RollingFile>
 
-        <File name="File1" fileName="src/logs/text.log" append="true" >
+        <File name="File1" fileName="src/logs/log.log" append="true" >
             <PatternLayout pattern="${pattern_console}"/>
         </File>
 

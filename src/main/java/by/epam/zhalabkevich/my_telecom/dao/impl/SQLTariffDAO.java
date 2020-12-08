@@ -28,15 +28,16 @@ public class SQLTariffDAO implements TariffDAO {
     private final Converter converter = Converter.getConverter();
 
     private final static String UPD_TARIFF = "UPDATE  tariffs SET name=?, description=?, price=?, speed=? WHERE id=?;";
-    private final static String ADD_TARIFF = "INSERT INTO tariffs (name, description, price, speed, discount) values (?,?,?,?,?);";
+    private final static String ADD_TARIFF = "INSERT INTO tariffs (name, description, price, speed) values (?,?,?,?);";
     private final static String GET_TARIFF_BY_ID = "SELECT name, price, speed, description  FROM tariffs WHERE id=?;";
     private final static String DEL_TARIFF_BY_ID = "DELETE  FROM tariffs WHERE id=?;";
     private final static String GET_TARIFF_BY_USER_ID = "SELECT tariffs.id as id, name, description, speed, price FROM tariffs JOIN tariff_notes ON tariffs.id = tariff_notes.tariff_id WHERE tariff_notes.account_id = ?;";
     private final static String GET_TARIFF_FROM_TO = "SELECT id, name, price, speed, description FROM tariffs LIMIT ? OFFSET ?;";
-    private static final String GET_USERS_TARIFFS_WITH_INFO = "SELECT tariffs.id, tariff_notes.id speed, name, price, promotions.description, discount, date_start, date_end, connection_date FROM tariffs JOIN tariff_notes ON tariff_notes.tariff_id=tariffs.id JOIN promotions ON tariffs.id = promotions.id WHERE tariff_notes.account_id=?;";
+    private static final String GET_USERS_TARIFFS_WITH_INFO = "SELECT tariffs.id as id, tariff_notes.id as noteId, promotions.id as promotionId,  speed, name, price, promotions.description, discount, date_start, date_end, connection_date FROM tariffs JOIN tariff_notes ON tariff_notes.tariff_id=tariffs.id JOIN promotions ON tariffs.id = promotions.id WHERE tariff_notes.account_id=?;";
     private static final String GET_TARIFFS_NUMBER = "SELECT COUNT(*) FROM tariffs";
     private static final String GET_TARIFF_NOTES_NUMBER = "SELECT COUNT(*) FROM tariff_notes";
     private static final String GET_TARIFF_NOTES_NUMBER_BY_TARIFF_ID = "SELECT COUNT(*) FROM tariff_notes WHERE tariff_id = ?";
+    private static final String GET_NUMBER_TARIFFS_WITH_NAME = "SELECT COUNT(*) FROM tariffs WHERE name = ?";
 
     public SQLTariffDAO() {
         Connection connection;
@@ -52,6 +53,7 @@ public class SQLTariffDAO implements TariffDAO {
             setPreparedStatement(connection, GET_TARIFFS_NUMBER);
             setPreparedStatement(connection, GET_TARIFF_NOTES_NUMBER);
             setPreparedStatement(connection, GET_TARIFF_NOTES_NUMBER_BY_TARIFF_ID);
+            setPreparedStatement(connection, GET_NUMBER_TARIFFS_WITH_NAME);
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
         }
@@ -72,8 +74,9 @@ public class SQLTariffDAO implements TariffDAO {
 
     @Override
     public Tariff addTariff(Tariff tariff) throws DAOException {
-        PreparedStatement statement = preparedStatementMap.get(ADD_TARIFF);
-        try {
+        try (Connection connection = connectionPool.takeConnection();
+             PreparedStatement statement = connection.prepareStatement(ADD_TARIFF, Statement.RETURN_GENERATED_KEYS);
+        ) {
             statement.setString(1, tariff.getName());
             statement.setString(2, tariff.getDescription());
             statement.setBigDecimal(3, tariff.getPrice());
@@ -85,7 +88,7 @@ public class SQLTariffDAO implements TariffDAO {
             }
             return tariff;
         } catch (SQLException e) {
-            logger.error("Can't add tariff");
+            logger.error(e);
             throw new DAOException(e);
         }
 
@@ -100,10 +103,10 @@ public class SQLTariffDAO implements TariffDAO {
             statement.setString(2, tariff.getDescription());
             statement.setBigDecimal(3, tariff.getPrice());
             statement.setInt(4, tariff.getSpeed());
-            statement.setLong(6, tariff.getId());
+            statement.setLong(5, tariff.getId());
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
-            logger.error("Can't add tariff");
+            logger.error(e);
             throw new DAOException(e);
         }
     }
@@ -120,7 +123,7 @@ public class SQLTariffDAO implements TariffDAO {
             }
             return tariff;
         } catch (SQLException e) {
-            logger.error("Can't get tariff by Id");
+            logger.error(e);
             throw new DAOException(e);
         }
 
@@ -134,6 +137,20 @@ public class SQLTariffDAO implements TariffDAO {
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             logger.error("can't delete tariff");
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public int getNumberTariffsWithName(String name) throws DAOException {
+        PreparedStatement statement = preparedStatementMap.get(GET_NUMBER_TARIFFS_WITH_NAME);
+        try {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+            logger.error(" can't get all tariffs");
             throw new DAOException(e);
         }
     }

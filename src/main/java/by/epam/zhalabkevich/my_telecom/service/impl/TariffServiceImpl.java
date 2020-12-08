@@ -7,11 +7,13 @@ import by.epam.zhalabkevich.my_telecom.dao.DAOProvider;
 import by.epam.zhalabkevich.my_telecom.dao.TariffDAO;
 import by.epam.zhalabkevich.my_telecom.service.ServiceException;
 import by.epam.zhalabkevich.my_telecom.service.TariffService;
+import by.epam.zhalabkevich.my_telecom.service.util.TariffDataValidator;
 
 import java.util.List;
 
 public class TariffServiceImpl implements TariffService {
     private final TariffDAO dao = DAOProvider.getInstance().getTariffDAO();
+    private final TariffDataValidator validator = TariffDataValidator.getInstance();
 
     @Override
     public int getTariffQuantity() throws ServiceException {
@@ -33,11 +35,19 @@ public class TariffServiceImpl implements TariffService {
 
     @Override
     public Tariff addTariff(Tariff tariff) throws ServiceException {
-        try {
-            return dao.addTariff(tariff);
-        } catch (DAOException e) {
-            throw new ServiceException("Impossible create a new tariff!");
+        if (validator.validateTariff(tariff)) {
+            try {
+                if (dao.getNumberTariffsWithName(tariff.getName()) == 0) {
+                    return dao.addTariff(tariff);
+                }
+                return new Tariff();
+            } catch (DAOException e) {
+                throw new ServiceException("Impossible create a new tariff!");
+            }
+        } else {
+            throw new ServiceException("Some field of new tariff are invalid!");
         }
+
     }
 
     @Override
@@ -51,11 +61,16 @@ public class TariffServiceImpl implements TariffService {
 
     @Override
     public boolean changeTariff(Tariff tariff) throws ServiceException {
-        try {
-            return dao.editTariff(tariff);
-        } catch (DAOException e) {
-            throw new ServiceException("Impossible to update tariff info");
+        if (validator.validateTariff(tariff)) {
+            try {
+                return dao.editTariff(tariff);
+            } catch (DAOException e) {
+                throw new ServiceException("Impossible to update tariff info");
+            }
+        } else {
+            throw new ServiceException("Some field of new tariff are invalid!");
         }
+
     }
 
     @Override
