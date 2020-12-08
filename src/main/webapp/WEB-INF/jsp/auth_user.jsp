@@ -8,8 +8,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="module" src="${pageContext.request.contextPath}/js/checkBalance.js"></script>
-    <script type="module" src="${pageContext.request.contextPath}/js/balanceValidation.js"></script>
+    <script type="text/javascript">
+        function valid(form) {
+            let fail = false;
+            let balance = form.balance.value;
+            if (balance === null && balance === '') {
+                fail = "Field is empty!";
+            } else if (balance.toString().includes(',')) {
+                fail = "Please, use '.' instead of ','!";
+            }
+            if(fail){
+                alert(fail);
+                return false;
+            }
+        }
+    </script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
     <fmt:setBundle basename="local" var="loc"/>

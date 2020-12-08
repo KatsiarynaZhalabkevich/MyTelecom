@@ -19,6 +19,7 @@ import java.util.Map;
 
 public class SQLUserDAO implements UserDAO {
     private final static Logger logger = LogManager.getLogger();
+
     private final Converter converter = Converter.getConverter();
     private final static ConnectionPool connectionPool = ConnectionPool.getInstance();
 
@@ -37,7 +38,7 @@ public class SQLUserDAO implements UserDAO {
     private static final String GET_USERS_FROM_TO = "SELECT id, name, surname, address, phone, email FROM users LIMIT ? OFFSET ?;";
     private static final String GET_USERS_ACCOUNT_FROM_TO = "SELECT u.id, a.id, name, surname, address, phone, email, balance, registration_date, status, role FROM users as u JOIN accounts as a ON u.id = a.user_id  LIMIT ? OFFSET ? ;";
     private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = "SELECT auth_info_id, name, surname, address, phone, email FROM auth_info LEFT JOIN users ON auth_info.id = users.auth_info_id WHERE login = ? AND password = ?";
-
+    private static final String FIND_USERS_BY_PARAMETERS = "select distinct u.id, name, surname, address, phone, email, balance, registration_date, status, role FROM users as u JOIN accounts as a ON u.id = a.user_id WHERE name LIKE ? OR surname LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ?;";
     private final Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
 
     public SQLUserDAO() {
@@ -59,6 +60,7 @@ public class SQLUserDAO implements UserDAO {
             setPreparedStatement(connection, FIND_AUTH_INFO_BY_LOGIN);
             setPreparedStatement(connection, GET_USERS_ACCOUNT_FROM_TO);
             setPreparedStatement(connection, COUNT_USER);
+            setPreparedStatement(connection, FIND_USERS_BY_PARAMETERS);
 
         } catch (ConnectionPoolException | DAOException e) {
             logger.error(e);
@@ -85,8 +87,8 @@ public class SQLUserDAO implements UserDAO {
             resultSet.next();
             return resultSet.getInt(1);
         } catch (SQLException e) {
-           logger.error(e);
-           throw new DAOException(e);
+            logger.error(e);
+            throw new DAOException(e);
         }
     }
 
@@ -230,6 +232,32 @@ public class SQLUserDAO implements UserDAO {
             throw new DAOException(e);
         }
         return users;
+    }
+
+    @Override
+    public List<UserAccount> findUsersByParameters(User user) throws DAOException {
+        //  select id, name, surname, phone, address, email FROM my_telecom.users
+        //  WHERE name LIKE ? OR surname LIKE ? OR phone=? OR email=? OR address LIKE ?;
+        List<UserAccount> users = new ArrayList<>();
+        PreparedStatement statement = preparedStatementMap.get(FIND_USERS_BY_PARAMETERS);
+        try {
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getSurname());
+            statement.setString(3, user.getPhone());
+            statement.setString(4, user.getEmail());
+            statement.setString(5, user.getAddress());
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                users.add(converter.convertUserAccountFromResultSet(resultSet));
+            }
+            return users;
+
+        } catch (SQLException e) {
+            logger.error(e);
+            logger.error("SQL problem with findUsersByParameters");
+            throw new DAOException(e);
+        }
     }
 
     @Override

@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"  errorPage="/page/error.jsp" %>
+         pageEncoding="UTF-8" errorPage="/page/error.jsp" %>
 <%@page import="by.epam.zhalabkevich.my_telecom.bean.User" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +21,40 @@
             padding: 5%;
         }
     </style>
-    <script type="module" src="${pageContext.request.contextPath}/js/editUserValidation.js"></script>
+    <script type="text/javascript">
+        function valid(form) {
+            let fail = false;
+            let name = form.name.value;
+            let surname = form.surname.value;
+            let phone = form.phone.value;
+            let email = form.email.value;
+            let password1 = form.password1.value;
+            let password2 = form.password2.value;
+            let email_pattern = /^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i;
+            let phone_pattern = /^\+?(\d{1,3})?[- .]?\(?(?:\d{2,3})\)?[- .]?\d\d\d[- .]?\d\d\d\d$/;
+            let password_pattern = /[0-9a-zA-Z!@#$%^&*]{6,}/;
+            let login_pattern = /[0-9a-zA-Z]{4,10}/;
+            if (name === "" || name === " ") {
+                fail = "Name is incorrect";
+            } else if (surname === "" || surname === " ") {
+
+                fail = "Surname is incorrect";
+            } else if (phone_pattern.test(phone) === false) {
+
+                fail = "Incorrect phone format";
+            } else if (email_pattern.test(email) === false) {
+                fail = "Incorrect email";
+
+            } else if (password1 !== password2) {
+                fail = "Passwords not equals";
+            }
+            if (fail) {
+                alert(fail);
+                return false;
+            }
+
+        }
+    </script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
     <fmt:setBundle basename="local" var="loc"/>
@@ -69,11 +102,7 @@
         <div class="col-md-6">
             <h2>${userinfo}</h2>
             <p style="color: red">${requestScope.updateMessage}</p>
-            <%--            <c:remove var="updateMessage" scope="session"/>--%>
             <p style="color: red">${requestScope.errorPasswordMessage}</p>
-            <%--            <c:remove var="errorPasswordMessage" scope="session"/>--%>
-
-
             <form action="controller" method="post" id="update" onsubmit="valid(document.getElementById('update'))">
                 <input type="hidden" name="command" value="update_user_info">
                 <div class="form-group"><label data-toggle="tooltip" title="${name}">  ${name}:</label>
@@ -101,13 +130,14 @@
                 </div>
                 </br>
             </form>
-            <form action="controller" method="post" id="update_pass" onsubmit="valid(document.getElementById('update_pass'))">
+            <form action="controller" method="post" id="update_pass"
+                  onsubmit="valid(document.getElementById('update_pass'))">
                 <input type="hidden" name="command" value="update_password">
                 <div class="form-group"><label>   ${password1}:</label>
                     <input type="password" data-toggle="tooltip" title="${password1}>6" id="password1" name="password1"
                            value=""></div>
                 </br>
-                <p style="color: red">${passwordError}</p>
+                <p style="color: red">${requestScope.passwordError}</p>
                 <div class="form-group"><label>  ${password2}:</label>
                     <input type="password" data-toggle="tooltip" title="${password1}>6" id="password2" name="password2"
                            value=""></div>

@@ -163,4 +163,26 @@ public class UserServiceImpl implements UserService {
         }
 
     }
+
+    @Override //данные для поиска не валидируем, их все равно в БД не записываем
+    public List<UserAccount> findUsersByParameters(User user) throws ServiceException {
+//       User userWithFlexibleParameters = new User(
+//               convertParameter(user.getName()),
+//               convertParameter(user.getSurname()),
+//               convertParameter(user.getPhone()),
+//               convertParameter(user.getEmail()),
+//               convertParameter(user.getAddress())
+//       );
+
+        try {
+            return userDAO.findUsersByParameters(user);
+        } catch (DAOException e) {
+            logger.error(e);
+            throw new ServiceException("Impossible to find users with such parameters! Try change criteria!");
+        }
+    }
+
+    private String convertParameter(String parameter){
+        return "%"+parameter+"%";
+    }
 }

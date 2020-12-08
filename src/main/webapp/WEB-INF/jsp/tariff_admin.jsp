@@ -12,7 +12,34 @@
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
 
-    <script type="module" src="../../js/tariffValidation.js"></script>
+    <script type="text/javascript">
+        function valid(form) {
+            let fail = false;
+            let name = form.name.value;
+            let description = form.description.value;
+            let speed = form.speed.value;
+            //let discount =form.discount.value;
+            let price = form.price.value;
+
+            if (name === "" || name === " ") {
+                fail = "Name is incorrect!";
+            } else if (description === "" || description === " ") {
+                fail = "Description is incorrect!";
+            } else if (speed === "" && speed === " ") {
+                fail = "Speed is incorrect!"
+            } else if (price === "" && price === " ") {
+                fail = "Price is incorrect!";
+            }
+            // } else if (discount ==="" && discount ===" ") {
+            //     fail = "Discount is incorrect!";
+            // }
+            if (fail) {
+                alert(fail);
+                return false;
+            }
+
+        }
+    </script>
 
     <fmt:setLocale value="${sessionScope.local}"/>
     <fmt:setBundle basename="local" var="loc"/>
@@ -49,10 +76,10 @@
     </div>
 </div>
 <div>
-    <p style="color: red" >${requestScope.errorMessage}</p>
-    <p style="color: #4cae4c" >${requestScope.editMessage}</p>
-    <p style="color: #4cae4c" >${requestScope.addMessage}</p>
-    <p style="color: #4cae4c" >${requestScope.deleteMessage}</p>
+    <p style="color: red">${requestScope.errorMessage}</p>
+    <p style="color: #4cae4c">${requestScope.editMessage}</p>
+    <p style="color: #4cae4c">${requestScope.addMessage}</p>
+    <p style="color: #4cae4c">${requestScope.deleteMessage}</p>
 </div>
 <div class="table-responsive">
     <table>
@@ -132,8 +159,8 @@
                            name="description"/></td>
                 <td><input type="number" id="speed" placeholder="${speed}" class="form-control" name="speed"/></td>
                 <td><input type="number" id="price" placeholder="${price}" class="form-control" name="price"/></td>
-<%--                Add promotion --%>
-<%--                <td><input type="number" id="discount" placeholder="${discount}" class="form-control" name="discount"/>--%>
+                <%--                Add promotion --%>
+                <%--                <td><input type="number" id="discount" placeholder="${discount}" class="form-control" name="discount"/>--%>
                 </td>
                 <td><input type="submit" class="btn btn-md btn-success" value="${addtariff}"></td>
             </form>

@@ -15,7 +15,7 @@ public final class JSPPageName {
     public static final String ADMIN_PAGE = "users/admin";
     public static final String SHOW_USERS_PAGE = "users";
     public static final String TARIFF_ADMIN_PAGE = "users/admin/tariffs";
-    public static final String SHOW_USERS_TARIFFS_PAGE = "users/user/tariffs";
+    public static final String SHOW_USERS_TARIFFS_PAGE = "users/admin/tariffs";
     public static final String STATISTIC_PAGE = "users/admin/statistic";
     public static final String SHOW_PROMO = "promotions";
 

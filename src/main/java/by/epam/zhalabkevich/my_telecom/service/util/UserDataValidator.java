@@ -16,56 +16,31 @@ public class UserDataValidator {
         return instance;
     }
 
-    //проверить на валидность логин и пароль
-    //логин должен быть уникальным? не пустой строкой и макс длина меньше
-
     public boolean checkLogin(String login) {
-        boolean flag = true; //пока только положительный сценарий
         String regLog = "[0-9a-zA-Z]{4,10}";
-   /*     if (login != null && !login.equals("")) {
-            flag = login.matches(regLog);
-        }*/
-        return flag;
+        return login != null && login.matches(regLog);
     }
 
     public boolean checkPassword(String password) {
-        boolean flag = true; //пока рассматриваем положительный сценарий
-        String regPas = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9@#$%]).{6,}";
-   /*   if (password != null) {
-            if (!password.equals("")) {
-                flag = password.matches(regPas);
-            }
-        }*/
-        return flag;
+        //  String regPas = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9@#$%]).{6,}";
+        String regPas = "[0-9a-zA-Z@#$%]{4,10}";
+        return password != null && password.matches(regPas);
     }
 
     public boolean checkName(String name) {
-        boolean flag = false;
-        String regExp = "^[а-яА-Я]{30}|[a-zA-Z]{30}$";
-        if (name != null) {
-            if (!name.equals("")) {
-
-                flag = true;
-
-            }
-        }
-
-        return flag;
+        String regExp = "[а-яА-Я]|[a-zA-Z]{4,30}";
+        return name != null && name.matches(regExp);
     }
 
     public boolean checkPhone(String phone) {
-        String regExp = "^\\+?(\\d{1,3})?[- .]?\\(?(?:\\d{2,3})\\)?[- .]?\\d\\d\\d[- .]?\\d\\d\\d\\d$";
-
-       // return phone != null && phone.matches(regExp);
-        return true;
+      //  String regExp = "^\\+?(\\d{1,3})?[- .]?\\(?(?:\\d{2,3})\\)?[- .]?\\d\\d\\d[- .]?\\d\\d\\d\\d$";
+        String regExp = "^(\\+375|80)([- (]?(29|25|44|33)[- )]?)([- ]?(\\d{3}))([- ]?(\\d{2}))([- ]?(\\d{2}))$";
+        return phone != null && phone.matches(regExp);
     }
 
     public boolean checkEmail(String email) {
-        String regExp = "^[A-Z0-9_]+@[A-Z0-9-]+.+.[A-Z]{2,4}$";
-
-        // return email != null && email.matches(regExp);
-        return true;
-
+        String regExp = "[a-zA-Z0-9_]+@[a-zA-Z0-9-]+.+.[a-zA-Z]{2,4}";
+        return email != null && email.matches(regExp);
     }
 
     public boolean userValidate(User user) {

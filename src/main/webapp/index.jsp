@@ -35,8 +35,23 @@
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
 
-<%--    <script type="module" src="${pageContext.request.contextPath}/js/loginValidation.js"></script>--%>
-    <script async type="module" src="${pageContext.request.requestURL}js/loginValidation.js"></script>
+    <script  type="text/javascript">
+        function valid(form) {
+            console.log("inside validation js");
+            let fail = false;
+            let login = form.login.value;
+            let password = form.password.value;
+            if (login === "" || login === " ") {
+                fail = "Please, insert your login";
+            } else if (password === "" || password === " ") {
+                fail = "Please, insert your password";
+            }
+            if (fail) {
+                alert(fail);
+                return false;
+            }
+        }
+    </script>
 
 
     <title>My Telecom </title>

@@ -39,6 +39,7 @@ public class CommandProvider {
         commands.put(CommandName.ADD_TARIFF, new AddNewTariffCommand());
         commands.put(CommandName.EDIT_TARIFF, new EditTariffCommand());
         commands.put(CommandName.DELETE_TARIFF, new DeleteTariffCommand());
+        commands.put(CommandName.FIND_USER, new FindUserByParameterCommand());
 
 
     }

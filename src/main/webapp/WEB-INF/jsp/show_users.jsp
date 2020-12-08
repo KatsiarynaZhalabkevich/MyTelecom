@@ -100,7 +100,6 @@
         <p style="color: #4cae4c">${requestScope.updStatusMessage}</p>
         <p style="color: #4cae4c">${requestScope.deleteUserMessage}</p>
         <p style="color: #4cae4c">${requestScope.errorMessage}</p>
-        <p style="color: #4cae4c">${requestScope.serviceMessage}</p>
     </div>
 
     <div class="row">
@@ -246,9 +245,9 @@
                 <td><input type="text" name="name" placeholder="${name}" value=""></td>
                 <td><input type="text" name="surname" placeholder="${surname}" value=""></td>
                 <td><input type="text" name="phone" placeholder="${phone}" value=""></td>
-                <td><input type="text" name="email" placeholder="email" value=""></td>
-                <td><input type="text" name="login" placeholder="${login}" value=""></td>
-                <td><input type="submit" class="btn btn-success" value="${find}"></td>
+                <td><input type="text" name="address" placeholder="${address}" value=""></td>
+                <td><input type="text" name="email" placeholder="${email}" value=""></td>
+                <td><input type="submit" class="btn btn-success btn-md" value="${find}"></td>
                 <td></td>
                 <td></td>
             </form>

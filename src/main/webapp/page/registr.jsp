@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-errorPage="/page/error.jsp" %>
+         errorPage="/page/error.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -14,8 +14,59 @@ errorPage="/page/error.jsp" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
-    <script type="module" src="../js/loginValidation.js"></script>
-    <script type="module" src="../js/userValidation.js"></script>
+    <script type="text/javascript">
+        function sign(form) {
+        let fail = false;
+        let login = form.login.value;
+        let password = form.password.value;
+        if (login === "" || login === " ") {
+            fail = "Please, insert your login";
+        } else if (password === "" || password === " ") {
+            fail = "Please, insert your password";
+        }
+        if (fail) {
+            alert(fail);
+            return false;
+        }
+    }</script>
+    <script type="text/javascript">
+        function valid(form) {
+            let fail = false;
+            let name = form.name.value;
+            let surname = form.surname.value;
+            let phone = form.phone.value;
+            let email = form.email.value;
+            let login = form.login.value;
+            let password1 = form.password1.value;
+            let password2 = form.password2.value;
+            let email_pattern = /^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i;
+            let phone_pattern = /^\+?(\d{1,3})?[- .]?\(?(?:\d{2,3})\)?[- .]?\d\d\d[- .]?\d\d\d\d$/;
+            let password_pattern = /[0-9a-zA-Z!@#$%^&*]{6,}/;
+            let login_pattern = /[0-9a-zA-Z]{4,10}/;
+            if (name === "" || name === " ") {
+                fail = "Name is incorrect";
+            } else if (surname === "" || surname === " ") {
+                fail = "Surname is incorrect";
+            } else if (phone_pattern.test(phone) === false) {
+
+                fail = "Incorrect phone format";
+            } else if (email_pattern.test(email) === false) {
+                fail = "Incorrect email";
+
+            } else if (login_pattern.test(login) === false) {
+                fail = "Incorrect login format";
+
+            } else if (password1 === "" || password1 === " ") {
+                fail = "Incorrect password format";
+            } else if (password1 !== password2) {
+                fail = "Passwords not equals";
+            }
+            if (fail) {
+                alert(fail);
+                return false;
+            }
+        }
+    </script>
 
 
     <fmt:setLocale value="${sessionScope.local}"/>
@@ -65,30 +116,37 @@ errorPage="/page/error.jsp" %>
     <div class="row">
         <div class="col-md-6">
             <h2>${mes3}</h2>
-            <form action="controller" method="post" id="registration"  onsubmit="valid(document.getElementById('registration'))">
+            <form action="controller" method="post" id="registration"
+                  onsubmit="valid(document.getElementById('registration'))">
                 <input type="hidden" name="command" value="registration"/>
                 <p style="color: red">${errorMessage}</p>
                 <div class="form-group">
-                    <label >${name}:</label>
+                    <label>${name}:</label>
                 </div>
                 <div class="form-group">
                     <input type="text" data-toggle="tooltip" title="${name}" name="name" value="user.name" id="name">
                 </div>
-                <div class="form-group"><label > ${surname}:</label></div>
-                <div class="form-group"><input type="text" data-toggle="tooltip" title="${surname}" name="surname" value="user.surname" id="surname"></div>
-                <div class="form-group"><label > ${phone}:</label></div>
-                <div class="form-group"><input type="text" name="phone" value="user.phone" data-toggle="tooltip" title="${phone} +375..." id="phone"></div>
-                <div class="form-group"><label > ${address}:</label></div>
-                <div class="form-group"><input type="text" data-toggle="tooltip" title="${address}" name="address" value="user.address" id="address"></div>
-                <div class="form-group"><label > ${email}:</label></div>
-                <div class="form-group"><input type="text" data-toggle="tooltip" title="${email}" name="email" value="user.email" id="email"></div>
+                <div class="form-group"><label> ${surname}:</label></div>
+                <div class="form-group"><input type="text" data-toggle="tooltip" title="${surname}" name="surname"
+                                               value="user.surname" id="surname"></div>
+                <div class="form-group"><label> ${phone}:</label></div>
+                <div class="form-group"><input type="text" name="phone" value="user.phone" data-toggle="tooltip"
+                                               title="${phone} +375..." id="phone"></div>
+                <div class="form-group"><label> ${address}:</label></div>
+                <div class="form-group"><input type="text" data-toggle="tooltip" title="${address}" name="address"
+                                               value="user.address" id="address"></div>
+                <div class="form-group"><label> ${email}:</label></div>
+                <div class="form-group"><input type="text" data-toggle="tooltip" title="${email}" name="email"
+                                               value="user.email" id="email"></div>
 
-                <div class="form-group"><label >${login}:</label></div>
-                <div class="form-group"><input type="text" name="login" value="" data-toggle="tooltip" title="${login} > 4" id="login"></div>
+                <div class="form-group"><label>${login}:</label></div>
+                <div class="form-group"><input type="text" name="login" value="" data-toggle="tooltip"
+                                               title="${login} > 4" id="login"></div>
                 <p style="color: red">${errorLoginMessage}</p>
-                <div class="form-group"> <label >${password1}:</label></div>
-                <div class="form-group"><input type="password" name="password1" value="" data-toggle="tooltip" title="${password} > 6" id="password"></div>
-                <div class="form-group"><label > ${password2}:</label></div>
+                <div class="form-group"><label>${password1}:</label></div>
+                <div class="form-group"><input type="password" name="password1" value="" data-toggle="tooltip"
+                                               title="${password} > 6" id="password"></div>
+                <div class="form-group"><label> ${password2}:</label></div>
                 <div class="form-group"><input type="password" name="password2" value="" id="password2"></div>
                 <p style="color: red">${errorPasswordMessage}</p>
 
@@ -102,14 +160,15 @@ errorPage="/page/error.jsp" %>
         <div class="col-md-6">
             <h2>${signin}</h2>
             <p>${mes4} </p>
-            <form action="controller" method="post" id="sign" onsubmit="return sign(document.getElementById('sign'))" >
-
+            <form action="controller" method="post" id="sign" onsubmit="sign(document.getElementById('sign'))">
                 <input type="hidden" name="command" value="authorization"/>
                 <div class="form-group">${login}:</div>
-                <div class="form-group"><input type="text" data-toggle="tooltip" title="${login}" name="login" id ="login1" value=""/></div>
+                <div class="form-group"><input type="text" data-toggle="tooltip" title="${login}" name="login"
+                                               id="login1" value=""/></div>
                 <div class="form-group">${password}:</div>
-                <div class="form-group"><input type="password" data-toggle="tooltip" title="${password}" name="password" id ="password1"  value=""/></div>
-                <p style="color: red">${loginErrorMessage}</p>
+                <div class="form-group"><input type="password" data-toggle="tooltip" title="${password}" name="password"
+                                               id="password1" value=""/></div>
+                <p style="color: red">${requestScope.loginErrorMessage}</p>
                 <div class="form-group"><input class="btn-success btn" type="submit" name="signup"
                                                value="${signin}">
                 </div>
@@ -118,9 +177,9 @@ errorPage="/page/error.jsp" %>
         </div>
     </div>
     </form>
-<%--   TODO Урл меняется и и команда не приходит куда надо--%>
+    <%--   TODO Урл меняется и и команда не приходит куда надо--%>
     <form action="main" method="get">
-        <input type="submit" class="btn btn-danger" value="${cancel}" />
+        <input type="submit" class="btn btn-danger" value="${cancel}"/>
     </form>
 </div>
 
@@ -133,8 +192,8 @@ errorPage="/page/error.jsp" %>
 <c:import url="/footer"/>
 
 <script>
-    $(document).ready (function () {
-$('[data-toggle="tooltip"]').tooltip();
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
 </body>

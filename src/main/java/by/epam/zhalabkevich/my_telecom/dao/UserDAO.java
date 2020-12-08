@@ -25,14 +25,7 @@ public interface UserDAO {
 
     List<UserAccount> getUsersWithAccount(int offset, int limit) throws DAOException;
 
-
-//    List<User> findUsersByName(String name) throws DAOException;
-//
-//    List<User> findUsersBySurname(String surname) throws DAOException;
-//
-//    List<User> findUsersByEmail(String email) throws DAOException;
-//
-//    List<User> findUsersByPhone(String phone) throws DAOException;
+    List<UserAccount> findUsersByParameters(User user) throws DAOException;
 
     int isLoginUnique(String login) throws DAOException; // аналогично findBy Login
 

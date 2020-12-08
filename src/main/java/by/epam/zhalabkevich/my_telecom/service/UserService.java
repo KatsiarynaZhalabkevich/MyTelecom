@@ -27,4 +27,6 @@ public interface UserService {
 
     boolean updatePassword(String newPassword, User user) throws ServiceException;
 
+    List<UserAccount> findUsersByParameters(User user) throws ServiceException;
+
 }

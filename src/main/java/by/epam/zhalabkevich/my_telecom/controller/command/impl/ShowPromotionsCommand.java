@@ -10,6 +10,7 @@ import by.epam.zhalabkevich.my_telecom.service.AccountService;
 import by.epam.zhalabkevich.my_telecom.service.PromotionService;
 import by.epam.zhalabkevich.my_telecom.service.ServiceException;
 import by.epam.zhalabkevich.my_telecom.service.ServiceProvider;
+import by.epam.zhalabkevich.my_telecom.service.util.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +40,7 @@ public class ShowPromotionsCommand implements Command {
         String goToPage;
 
         try {
-            List<Promotion> promotions = Pagination.makePromotionPage(request);
+            List<Promotion> promotions = (List<Promotion>) Pagination.makePage(Service.PROMOTION,1, 3);
             request.setAttribute("promotionsList", promotions);
             if (Role.ADMIN.equals(accountService.checkRoleByUserId(admin.getId()))) {
                 goToPage = JSPPageName.SHOW_PROMO;
